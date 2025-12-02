@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <title>{{title}}</title>
+    <style>
+    .flash-message {
+        transition: opacity 0.8s ease-in-out;
+    }
+    </style>
+    <style>
+        .navbar-brand-custom {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb); /* голубой градиент */
+            color: #ffffff !important; /* white текст */
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid #1565c0;
+            font-weight: bold;
+            text-decoration: none;
+            text-shadow:
+                -1px -1px 0 #000,
+                 1px -1px 0 #000,
+                -1px 1px 0 #000,
+                 1px 1px 0 #000;
+        }
+
+        .user-name-custom {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb); /* white blue */
+            color: #ffffff !important; /* темно-зеленый текст */
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #1565c0;
+            font-weight: 500;
+            text-shadow:
+                -1px -1px 0 #000,
+                 1px -1px 0 #000,
+                -1px 1px 0 #000,
+                 1px 1px 0 #000;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand-custom" href="#">FoodHub</a>
+            {% if current_user.is_authenticated %}
+                <div>
+                    <!-- Кнопка выхода -->
+                    <a class="btn btn-outline-danger btn-sm" href="/logout">Выйти</a>
+                    <!-- Кнопка избранного -->
+                    <a href="/favourites" class="btn btn-warning">⭐ Избранное</a>
+                    <!-- Имя пользователя -->
+                    <span class="user-name-custom ml-2">{{ current_user.name }}</span>
+                </div>
+            {% else %}
+                <div>
+                    <a class="btn btn-info" href="/register">Зарегистрироваться</a>
+                    <a class="btn btn-success" href="/login">Войти</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+<!-- Begin page content -->
+<main role="main" class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} flash-message" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+<script>
+setTimeout(function() {
+    var messages = document.querySelectorAll('.flash-message');
+    messages.forEach(function(message) {
+        message.style.opacity = '0';
+        setTimeout(function() {
+            message.remove();
+        }, 800);
+    });
+}, 3000);
+</script>
+
+</body>
+</html>

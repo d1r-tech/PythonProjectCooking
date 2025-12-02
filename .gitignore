@@ -1,0 +1,21 @@
+# Python 
+__pycache__/ 
+*.py[cod] 
+*$py.class 
+Режим вывода команд на экран (ECHO) включен.
+# PyCharm 
+.idea/ 
+*.iml 
+Режим вывода команд на экран (ECHO) включен.
+# Database 
+*.db 
+*.sqlite3 
+Режим вывода команд на экран (ECHO) включен.
+# Virtual Environment 
+venv/ 
+env/ 
+.venv/ 
+Режим вывода команд на экран (ECHO) включен.
+# OS files 
+.DS_Store 
+Thumbs.db 

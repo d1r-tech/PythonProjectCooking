@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>⭐ Мои избранные рецепты ⭐</h2>
+    
+    {% if recipes %}
+        <div class="recipes">
+            {% for recipe in recipes %}
+            <div class="recipe-card card mb-3">
+                <div class="card-body">
+                    <h4 class="card-title">{{ recipe.title }}</h4>
+                    <p class="card-text"><strong>Ингредиенты:</strong> {{ recipe.ingredients }}</p>
+                    <p class="card-text"><strong>Приготовление:</strong><br>{{ recipe.content | replace('\n', '<br>') | safe }}</p>
+                    <p class="card-text"><strong>Аллергены:</strong>
+                        {% if recipe.allergens %}
+                            {% for allergen in recipe.allergens %}
+                                <span class="badge badge-danger">{{ allergen.title }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-success">нет</span>
+                        {% endif %}
+                    </p>
+                    <a href="/remove_from_favourites/{{ recipe.id }}" class="btn btn-outline-danger btn-sm">
+                        ❌ Удалить из избранного
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h5>У вас пока нет избранных рецептов</h5>
+            <p>Перейдите в <a href="/">разделы с рецептами</a> и добавьте понравившиеся!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
