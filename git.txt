@@ -1,1 +1,6 @@
 https://github.com/d1r-tech/foodh.git
+
+git config --global user.name "d1r-tech"
+git config --global user.email "sch1518@yandex.ru"
+
+git commit -m "Первая загрузка проекта FoodHub"

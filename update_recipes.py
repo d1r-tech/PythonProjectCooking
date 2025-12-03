@@ -5,10 +5,14 @@ from data.allergens import Allergen
 
 def update_recipes():
     """Добавляет только новые рецепты из default_recipes.py в БД"""
-    from data.default_recipes import DEFAULT_RECIPES  # ← импорт ВНУТРИ функции
+    from data.default_recipes import DEFAULT_RECIPES
+    from data.default_allergens import create_default_allergens  # ← НОВАЯ СТРОКА
 
     db_session.global_init("db/blogs.db")
     db_sess = db_session.create_session()
+
+    # ★★★ ВАЖНО: сначала добавляем недостающие аллергены ★★★
+    create_default_allergens(db_sess)
 
     # Получаем существующие названия рецептов
     existing_titles = [r.title for r in db_sess.query(Recipes).all()]
