@@ -234,6 +234,7 @@
 .btn-primary[href*="Основные блюда"] { background-image: url('/static/images/hotdishes.jpg'); }
 .btn-primary[href*="Сладкие созвездия ✨"] { background-image: url('/static/images/desserts.jpg'); }
 .btn-primary[href*="Гравитационные супы 🥣"] { background-image: url('/static/images/soup.jpg'); }
+.btn-primary[href*="Галактические напитки 🚀"] { background-image: url('/static/images/drinks.jpg'); }
 </style>
 <!-- ФИЛЬТР ПО АЛЛЕРГЕНАМ -->
 {% if selected_category %}
@@ -245,14 +246,14 @@
             Выберите аллергены
         </button>
         <div class="dropdown-menu" style="padding: 10px; width: 300px;">
-            {% for allergen in all_allergens %}
+            <!-- ⭐ СОРТИРОВКА ПО АЛФАВИТУ ⭐ -->
+            {% for allergen in all_allergens|sort(attribute='title') %}
             <div class="form-check">
                 <input class="form-check-input allergen-checkbox" type="checkbox" value="{{ allergen.id }}" id="allergen{{ allergen.id }}">
-                <label class="form-check-label" for="allergen{{ allergen.id }}">
-                    {{ allergen.title }}
-                </label>
-            </div>
-            {% endfor %}
+            <label class="form-check-label" for="allergen{{ allergen.id }}">
+                {{ allergen.title }}
+        </div>
+        {% endfor %}
             <div class="mt-2">
                 <button class="btn btn-info" onclick="applyFilter()">Применить</button>
                 <button class="btn btn-secondary" onclick="clearFilter()">Сбросить</button>
@@ -304,7 +305,10 @@
                                 </a>
                             {% endif %}
                         {% else %}
-                            <button class="btn btn-outline-secondary btn-sm" title="Зарегистрируйтесь, чтобы добавить рецепт в избранное">
+                            <!-- ⭐ ИСПРАВЛЕННАЯ КНОПКА ⭐ -->
+                            <button class="btn btn-outline-secondary btn-sm"
+                                onclick="showRegistrationAlert()"
+                                title="Зарегистрируйтесь, чтобы добавить рецепт в избранное">
                                 ☆ Добавить в избранное
                             </button>
                         {% endif %}
@@ -380,4 +384,64 @@ function filterRecipes() {
 }
 </script>
 {% endif %}
+<!-- Полоска-уведомление сверху -->
+<div id="registrationAlert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;">
+    <div style="background: #e8e8e8; color: #333; padding: 15px 20px; border-bottom: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 16px; font-weight: 500;">
+                📝 <strong>Чтобы добавить рецепт в избранное, зарегистрируйтесь</strong>
+            </div>
+            <button onclick="hideRegistrationAlert()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">
+                ×
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+function showRegistrationAlert() {
+    const alertDiv = document.getElementById('registrationAlert');
+
+    // Показываем уведомление
+    alertDiv.style.display = 'block';
+
+    // Автоматическое скрытие через 4 секунды
+    setTimeout(() => {
+        hideRegistrationAlert();
+    }, 4000);
+}
+
+function hideRegistrationAlert() {
+    document.getElementById('registrationAlert').style.display = 'none';
+}
+</script>
+<style>
+#registrationAlert {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+/* Затемнение фона (опционально) */
+#registrationAlert::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: -1;
+    display: none;
+}
+</style>
 {% endblock %}
