@@ -203,6 +203,7 @@
 </style>
 {% endif %}
 
+
 <!-- ⭐⭐⭐ ВАШ СТАРЫЙ КОД НИЖЕ (БЕЗ ИЗМЕНЕНИЙ) ⭐⭐⭐ -->
 <style>
 /* ВАШ СТАРЫЙ CSS ОСТАЁТСЯ БЕЗ ИЗМЕНЕНИЙ */
@@ -210,31 +211,9 @@
     display: flex;
     gap: 25px;
     flex-wrap: wrap;
-    margin: 20px 0;
+    margin: 40px 0;
+    justify-content: center;
 }
-
-.btn-primary {
-    padding: 12px 24px;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 16px;
-    display: inline-block;
-    text-align: center;
-    min-width: 300px;
-    min-height: 100px;
-    background-size: cover;
-    background-position: center;
-    text-shadow: 1px 1px 2px black;
-    border: 2px solid white;
-    font-weight: bold;
-}
-
-.btn-primary[href*="Утренние планеты 🪐"] { background-image: url('/static/images/breakfast.jpg'); }
-.btn-primary[href*="Основные блюда"] { background-image: url('/static/images/hotdishes.jpg'); }
-.btn-primary[href*="Сладкие созвездия ✨"] { background-image: url('/static/images/desserts.jpg'); }
-.btn-primary[href*="Гравитационные супы 🥣"] { background-image: url('/static/images/soup.jpg'); }
-.btn-primary[href*="Галактические напитки 🚀"] { background-image: url('/static/images/drinks.jpg'); }
 </style>
 <!-- ФИЛЬТР ПО АЛЛЕРГЕНАМ -->
 {% if selected_category %}
@@ -253,7 +232,7 @@
             <label class="form-check-label" for="allergen{{ allergen.id }}">
                 {{ allergen.title }}
             </div>
-        {% endfor %}
+            {% endfor %}
             <div class="mt-2">
                 <button class="btn btn-info" onclick="applyFilter()">Применить</button>
                 <button class="btn btn-secondary" onclick="clearFilter()">Сбросить</button>
@@ -268,15 +247,75 @@
 {% if not selected_category %}
 <!-- БЛОК ВЫБОРА РАЗДЕЛОВ -->
 <h2>Выберите раздел рецептов:</h2>
-<div class="categories mb-4">
-    <div class="category-buttons">
-        {% for category in categories %}
-            <a href="/?category={{ category }}" class="btn btn-primary">
-                {{ category }}
-            </a>
-        {% endfor %}
+<div style="margin: 40px 0; background: rgba(0,0,255,0.1); padding: 20px; border: 2px solid blue;">
+    <div style="display: flex; flex-wrap: wrap; gap: 25px; justify-content: center;">
+        <!-- 1. Завтраки -->
+        <a href="/?category=Утренние планеты 🪐"
+           style="display: block !important; width: 300px !important; height: 100px !important;
+                  background: url('/static/images/breakfast.jpg') center/cover no-repeat !important;
+                  color: white !important; text-decoration: none !important; border-radius: 12px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
+                  font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
+                  position: relative !important; overflow: hidden !important;">
+            <span style="position: relative; z-index: 2;">🌅 Утренние планеты 🪐</span>
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
+        </a>
+
+        <!-- 2. Основные блюда -->
+        <a href="/?category=Основные блюда"
+           style="display: block !important; width: 300px !important; height: 100px !important;
+                  background: url('/static/images/hotdishes.jpg') center/cover no-repeat !important;
+                  color: white !important; text-decoration: none !important; border-radius: 12px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
+                  font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
+                  position: relative !important; overflow: hidden !important;">
+            <span style="position: relative; z-index: 2;">🍛 Основные блюда</span>
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
+        </a>
+
+        <!-- 3. Десерты -->
+        <a href="/?category=Сладкие созвездия ✨"
+           style="display: block !important; width: 300px !important; height: 100px !important;
+                  background: url('/static/images/desserts.jpg') center/cover no-repeat !important;
+                  color: white !important; text-decoration: none !important; border-radius: 12px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
+                  font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
+                  position: relative !important; overflow: hidden !important;">
+            <span style="position: relative; z-index: 2;">🍰 Сладкие созвездия ✨</span>
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
+        </a>
+
+        <!-- 4. Супы -->
+        <a href="/?category=Гравитационные супы 🥣"
+           style="display: block !important; width: 300px !important; height: 100px !important;
+                  background: url('/static/images/soup.jpg') center/cover no-repeat !important;
+                  color: white !important; text-decoration: none !important; border-radius: 12px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
+                  font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
+                  position: relative !important; overflow: hidden !important;">
+            <span style="position: relative; z-index: 2;">🥣 Гравитационные супы 🥣</span>
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
+        </a>
+
+        <!-- 5. Напитки -->
+        <a href="/?category=Галактические напитки 🚀"
+           style="display: block !important; width: 300px !important; height: 100px !important;
+                  background: url('/static/images/drinks.jpg') center/cover no-repeat !important;
+                  color: white !important; text-decoration: none !important; border-radius: 12px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
+                  font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
+                  position: relative !important; overflow: hidden !important;">
+            <span style="position: relative; z-index: 2;">🚀 Галактические напитки 🚀</span>
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
+        </a>
     </div>
 </div>
+
 {% else %}
 <!-- БЛОК РЕЦЕПТОВ -->
 <div class="recipes-section">
@@ -295,21 +334,14 @@
                     </p>
                     <div class="favourite-section">
                         {% if current_user.is_authenticated %}
-                            {% if recipe in current_user.favourite_recipes %}
-                                <a href="/remove_from_favourites/{{ recipe.id }}" class="btn btn-success btn-sm">
-                                    ★ В избранном
-                                </a>
-                            {% else %}
-                                <a href="/add_to_favourites/{{ recipe.id }}" class="btn btn-outline-success btn-sm">
-                                    ☆ Добавить в избранное
-                                </a>
-                            {% endif %}
+                            <a href="/add_to_favourites/{{ recipe.id }}" class="btn btn-outline-success btn-sm">
+                                ☆ Добавить в избранное
+                            </a>
                         {% else %}
-                            <!-- ⭐ ИСПРАВЛЕННАЯ КНОПКА ⭐ -->
                             <button class="btn btn-outline-secondary btn-sm"
                                 onclick="showRegistrationAlert()"
                                 title="Зарегистрируйтесь, чтобы добавить рецепт в избранное">
-                                ☆ Добавить в избранное
+                                    ☆ Добавить в избранное
                             </button>
                         {% endif %}
                     </div>
@@ -325,7 +357,7 @@
         <a href="/" class="btn btn-secondary">← Назад к разделам</a>
     </div>
 </div>
-
+{% endif %}
 <!-- JavaScript для фильтрации -->
 <script>
 let selectedAllergens = [];
@@ -383,7 +415,6 @@ function filterRecipes() {
     });
 }
 </script>
-{% endif %}
 <!-- Полоска-уведомление сверху -->
 <div id="registrationAlert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;">
     <div style="background: #e8e8e8; color: #333; padding: 15px 20px; border-bottom: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
