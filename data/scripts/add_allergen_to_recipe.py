@@ -5,7 +5,7 @@ from data.allergens import Allergen
 
 
 def add_allergen_to_recipe():
-    db_session.global_init("db/blogs.db")
+    db_session.global_init("../../db/blogs.db")
     db_sess = db_session.create_session()
 
     # Настройки

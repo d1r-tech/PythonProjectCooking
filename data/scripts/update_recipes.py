@@ -8,7 +8,7 @@ def update_recipes():
     from data.default_recipes import DEFAULT_RECIPES
     from data.default_allergens import create_default_allergens  # ← НОВАЯ СТРОКА
 
-    db_session.global_init("db/blogs.db")
+    db_session.global_init("../../db/blogs.db")
     db_sess = db_session.create_session()
 
     # ★★★ ВАЖНО: сначала добавляем недостающие аллергены ★★★
