@@ -4,7 +4,7 @@ from data.recipes import Recipes
 
 
 def rename_categories():
-    db_session.global_init("../../db/blogs.db")
+    db_session.global_init("../db/blogs.db")
     db_sess = db_session.create_session()
 
     # СТАРОЕ название → НОВОЕ название
