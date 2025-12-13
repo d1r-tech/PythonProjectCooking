@@ -263,7 +263,7 @@
         </a>
 
         <!-- 2. Основные блюда -->
-        <a href="/?category=Основные блюда"
+        <a href="/?category=Орбитальные обеды 🛰️🥘"
            style="display: block !important; width: 300px !important; height: 100px !important;
                   background: url('/static/images/hotdishes.jpg') center/cover no-repeat !important;
                   color: white !important; text-decoration: none !important; border-radius: 12px !important;
@@ -271,7 +271,7 @@
                   text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
                   font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
                   position: relative !important; overflow: hidden !important;">
-            <span style="position: relative; z-index: 2;">🍛 Основные блюда</span>
+            <span style="position: relative; z-index: 2;">Орбитальные обеды 🛰️🥘</span>
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
@@ -319,8 +319,7 @@
 {% else %}
 <!-- БЛОК РЕЦЕПТОВ -->
 <div class="recipes-section">
-    <h3>"{{ selected_category }}"</h3>
-
+    <h3>{{ selected_category }}</h3>
     <div id="recipesList">
         {% if recipes %}
             {% for recipe in recipes %}

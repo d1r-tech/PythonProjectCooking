@@ -1,0 +1,56 @@
+# scripts/fix_recipe.py
+from data import db_session
+from data.recipes import Recipes
+from data.allergens import Allergen
+
+
+def fix_recipe():
+    db_session.global_init("../db/blogs.db")
+    db_sess = db_session.create_session()
+
+    try:
+        # 1. Находим рецепт
+        recipe = db_sess.query(Recipes).filter(
+            Recipes.title == "Овощное рагу"
+        ).first()
+
+        if not recipe:
+            print("❌ Рецепт не найден")
+            return
+
+        print(f"🛠️ Исправляю рецепт: {recipe.title}")
+
+        # 2. Меняем категорию
+        recipe.category = "Орбитальные обеды 🛰️🥘"
+        print(f"✅ Категория изменена на: {recipe.category}")
+
+        # 3. Очищаем старые аллергены
+        recipe.allergens.clear()
+
+        # 4. Добавляем правильные аллергены
+        correct_allergens = ["Картофель", "Морковь", "Помидор", "Соя"] # ваши правильные аллергены
+
+        for allergen_name in correct_allergens:
+            allergen = db_sess.query(Allergen).filter(
+                Allergen.title == allergen_name
+            ).first()
+
+            if allergen:
+                recipe.allergens.append(allergen)
+                print(f"✅ Добавлен аллерген: {allergen.title}")
+            else:
+                print(f"⚠️ Аллерген не найден в БД: {allergen_name}")
+
+        # 5. Сохраняем
+        db_sess.commit()
+        print("🎉 Рецепт исправлен!")
+
+    except Exception as e:
+        db_sess.rollback()
+        print(f"❌ Ошибка: {e}")
+    finally:
+        db_sess.close()
+
+
+if __name__ == "__main__":
+    fix_recipe()
