@@ -8,8 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/default_recipes.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/default_recipes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/blogs.db" beforeDir="false" afterPath="$PROJECT_DIR$/db/blogs.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/rename_categories.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/rename_categories.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/fix_recipe.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/fix_recipe.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
