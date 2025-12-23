@@ -73,22 +73,23 @@
     </style>
     <style>
     body {
-        background: linear-gradient(135deg, #0a0e2a 0%, #1a1f4b 30%, #2c1b47 100%);
-        color: #e0e1dd;
+        background-color: #FFF8F0 !important;
+        background: linear-gradient(135deg, #FFF8F0 0%, #FFFAF4 100%) !important;
+        color: #333333;
         font-family: 'Segoe UI', sans-serif;
         min-height: 100vh;
         margin: 0;
         padding: 0;
     }
     .card {
-        background: rgba(32, 38, 92, 0.7) !important;
-        border: 1px solid rgba(74, 144, 226, 0.3) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
         border-radius: 15px !important;
-        color: white !important;
+        color: #333333 !important;
     }
     h1, h2, h3, h4 {
-        color: #e0e1dd;
-        font-family: 'Orbitron', sans-serif;
+        color: #333333;
+        font-family: 'Arial', sans-serif;
         letter-spacing: 0.5px;
     }
     .accent-gradient {
@@ -130,36 +131,81 @@
         }
 
         .user-name-custom {
-            background: linear-gradient(135deg, #4ecdc4, #45b7d1) !important; /* голубой градиент */
-            color: #000000 !important; /* черный текст */
+            background: linear-gradient(135deg, #4ecdc4, #45b7d1) !important;
+            color: #000000 !important;
             padding: 6px 12px;
             border-radius: 6px;
             border: 1px solid #1565c0;
             font-weight: 500;
-            text-shadow: none !important; /* убираем черную обводку */
+            font-size: 0.9rem;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
 <header>
-    <nav class="navbar bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg" style="
+        background-color: #FFF8F0 !important;  /* кремовый цвет */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;  /* легкая тень */
+        padding: 20px 25px !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+        min-height: 80px !important;
+    ">
         <div class="container-fluid">
-            <div style="width: 120px;"></div>
-            {% if current_user.is_authenticated %}
-                <div>
-                    <!-- Кнопка выхода -->
-                    <a class="btn btn-outline-danger btn-sm" href="/logout">Выйти</a>
-                    <!-- Кнопка избранного -->
-                    <a href="/favourites" class="btn btn-warning">⭐ Избранное</a>
-                    <!-- Имя пользователя -->
-                    <span class="user-name-custom ml-2">{{ current_user.name }}</span>
-                </div>
-            {% else %}
-                <div>
-                    <a class="btn btn-info" href="/register">Зарегистрироваться</a>
-                    <a class="btn btn-success" href="/login">Войти</a>
-                </div>
-            {% endif %}
+            <!-- Логотип слева -->
+            <a class="navbar-brand" href="/" style="
+                font-family: 'Arial', sans-serif;
+                font-weight: 700;
+                font-size: 1.8rem;
+                color: #D4A574 !important;  /* теплый коричневый */
+                text-decoration: none;
+            ">
+                🍽️ FOODHUB
+            </a>
+
+            <!-- Кнопки справа -->
+            <div class="d-flex align-items-center">
+                {% if current_user.is_authenticated %}
+                    <!-- Для авторизованных -->
+                    <a class="btn btn-outline-danger btn-sm me-2" href="/logout" style="
+                        border-width: 2px;
+                        font-weight: 500;
+                        padding: 8px 16px;
+                    ">
+                        Выйти
+                    </a>
+                    <a href="/favourites" class="btn btn-warning btn-sm me-2" style="
+                        background-color: #FFD166;
+                        border: none;
+                        color: #333;
+                        font-weight: 500;
+                        padding: 8px 16px;
+                    ">
+                        ⭐ Избранное
+                    </a>
+                    <span class="user-name-custom">{{ current_user.name }}</span>
+                {% else %}
+                    <!-- Для гостей -->
+                    <a class="btn btn-info btn-sm me-2" href="/register" style="
+                        background-color: #4ECDC4;
+                        border: none;
+                        color: white;
+                        font-weight: 500;
+                        padding: 8px 16px;
+                    ">
+                        Регистрация
+                    </a>
+                    <a class="btn btn-success btn-sm" href="/login" style="
+                        background-color: #06D6A0;
+                        border: none;
+                        color: white;
+                        font-weight: 500;
+                        padding: 8px 16px;
+                    ">
+                        Войти
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 </header>

@@ -3,202 +3,54 @@
 {% block content %}
 <!-- ⭐⭐⭐ КОМПАКТНЫЙ ЛОГОТИП В УГЛУ (ТОЛЬКО В РАЗДЕЛАХ) ⭐⭐⭐ -->
 {% if selected_category %}
-<div style="margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid rgba(74, 144, 226, 0.2);">
-    <a href="/" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(10, 14, 42, 0.9); border-radius: 20px; border: 1px solid rgba(74, 144, 226, 0.5); box-shadow: 0 0 10px rgba(0, 150, 255, 0.2);">
-        <span style="font-size: 20px; animation: rotate 20s infinite linear;">🪐</span>
-        <span style="font-family: 'Orbitron', sans-serif; font-weight: 700; color: white; font-size: 1rem; letter-spacing: 0.5px;">FOODHUB</span>
+<div style="
+    margin-bottom: 25px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+">
+    <a href="/" style="
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        background-color: #FFF8F0;
+        border-radius: 12px;
+        border: 1px solid rgba(212, 165, 116, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    ">
+        <span style="
+            font-size: 22px;
+            color: #D4A574;
+        ">🍽️</span>
+        <span style="
+            font-family: 'Arial', sans-serif;
+            font-weight: 700;
+            color: #D4A574;
+            font-size: 1.1rem;
+        ">FOODHUB</span>
+        <span style="
+            color: #666;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        ">← На главную</span>
     </a>
 </div>
 
 <style>
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Анимация для кнопки (опционально) */
+a[href="/"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: rgba(212, 165, 116, 0.5);
 }
 </style>
-{% endif %}
 
-<!-- ⭐⭐⭐ БОЛЬШОЙ ЛОГОТИП (ТОЛЬКО НА ГЛАВНОЙ) ⭐⭐⭐ -->
-{% if not selected_category %}
-<div class="space-logo-container" style="max-width: 600px; margin: 20px 0 20px 20px;">
-  <div class="space-logo">
-    <!-- Планета-тарелка -->
-    <div class="planet-dish" style="width: 120px; height: 120px;">
-      <div class="planet-surface">
-        <div class="crater"></div>
-        <div class="crater"></div>
-        <div class="crater"></div>
-      </div>
-      <div class="food-orbit" style="width: 200px; height: 200px; top: -40px; left: -40px;">
-        <div class="food-item pizza">🍕</div>
-        <div class="food-item burger">🍔</div>
-        <div class="food-item dessert">🍰</div>
-      </div>
-    </div>
-
-    <!-- Название -->
-    <div class="logo-text">
-      <h1 class="main-title" style="font-size: 2.5rem;">FOODHUB</h1>
-      <p class="subtitle" style="font-size: 1rem;">Cosmic Cuisine Navigator</p>
-      <div class="tagline" style="font-size: 0.9rem;">Explore the galaxy of flavors 🚀</div>
-    </div>
-
-    <!-- Звёзды -->
-    <div class="star star-1">★</div>
-    <div class="star star-2">★</div>
-    <div class="star star-3">★</div>
-    <div class="star star-4">★</div>
-  </div>
-</div>
-
-<!-- Стили для большого логотипа -->
 <style>
-.space-logo-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 0;
-  background: linear-gradient(180deg, #0a0e2a 0%, #1a1f4b 100%);
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(0, 150, 255, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.space-logo {
-  position: relative;
-  text-align: center;
-  padding: 20px;
-}
-
-/* Планета-тарелка */
-.planet-dish {
-  background: radial-gradient(circle at 30% 30%, #4a90e2, #2c3e50);
-  border-radius: 50%;
-  margin: 0 auto 20px;
-  position: relative;
-  box-shadow:
-    inset 0 -15px 30px rgba(0, 0, 0, 0.7),
-    0 0 40px rgba(74, 144, 226, 0.6),
-    0 0 0 6px rgba(255, 255, 255, 0.1);
-  animation: rotate 60s infinite linear;
-}
-
-.planet-surface {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-}
-
-.crater {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 50%;
-}
-.crater:nth-child(1) { width: 25px; height: 25px; top: 20px; left: 35px; }
-.crater:nth-child(2) { width: 18px; height: 18px; bottom: 40px; right: 30px; }
-.crater:nth-child(3) { width: 22px; height: 22px; top: 70px; left: 20px; }
-
-/* Орбита с едой */
-.food-orbit {
-  position: absolute;
-  animation: orbit 20s infinite linear;
-}
-
-.food-item {
-  position: absolute;
-  font-size: 20px;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.pizza { top: 0; left: 85px; animation: bounce 3s infinite ease-in-out; }
-.burger { top: 85px; left: 170px; animation: bounce 3s infinite ease-in-out 0.5s; }
-.dessert { top: 170px; left: 85px; animation: bounce 3s infinite ease-in-out 1s; }
-
-/* Текст логотипа */
-.logo-text {
-  margin-top: 20px;
-}
-
-.main-title {
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 900;
-  background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-shift 8s infinite alternate;
-  letter-spacing: 2px;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.subtitle {
-  font-family: 'Arial', sans-serif;
-  color: #a0e7ff;
-  letter-spacing: 1.5px;
-  margin: 8px 0;
-  text-transform: uppercase;
-}
-
-.tagline {
-  color: #ffeaa7;
-  font-style: italic;
-  margin-top: 10px;
-}
-
-/* Звёзды */
-.star {
-  position: absolute;
-  color: white;
-  font-size: 16px;
-  animation: twinkle 3s infinite alternate;
-}
-.star-1 { top: 15px; left: 15px; animation-delay: 0s; }
-.star-2 { top: 30px; right: 40px; animation-delay: 0.5s; }
-.star-3 { bottom: 40px; left: 60px; animation-delay: 1s; }
-.star-4 { bottom: 20px; right: 20px; animation-delay: 1.5s; }
-
-/* Анимации */
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-@keyframes orbit {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-
-@keyframes twinkle {
-  0% { opacity: 0.3; transform: scale(0.8); }
-  100% { opacity: 1; transform: scale(1.2); }
-}
-
-/* Для мобильных */
-@media (max-width: 768px) {
-  .space-logo-container {
-    max-width: 90%;
-    margin: 10px !important;
-    padding: 15px 0;
-  }
-  .main-title { font-size: 2rem !important; }
-  .planet-dish { width: 100px !important; height: 100px !important; }
-  .food-orbit { width: 160px !important; height: 160px !important; top: -30px !important; left: -30px !important; }
 }
 </style>
 {% endif %}
@@ -247,7 +99,7 @@
 {% if not selected_category %}
 <!-- БЛОК ВЫБОРА РАЗДЕЛОВ -->
 <h2>Выберите раздел рецептов:</h2>
-<div style="margin: 40px 0; background: rgba(0,0,255,0.1); padding: 20px; border: 2px solid blue;">
+<div style="margin: 40px 0;">
     <div style="display: flex; flex-wrap: wrap; gap: 25px; justify-content: center;">
         <!-- 1. Завтраки -->
         <a href="/?category=Утренние планеты 🪐"
