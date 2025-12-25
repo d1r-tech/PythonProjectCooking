@@ -9,6 +9,7 @@ from forms.recipes import RecipesForm
 from forms.user import RegisterForm, LoginForm
 #from openai import OpenAI
 from data.default_recipes import create_default_recipes
+import os
 
 # client = OpenAI(api_key="sk-2ac11b4f4b4142f8ae0e93bafe291802", base_url="https://api.deepseek.com")
 
@@ -33,6 +34,14 @@ db_sess.close()
 
 @app.route("/")
 def index():
+    # 1. Определение темы
+    THEME = os.environ.get('APP_THEME', 'food')
+
+    # 2. Выбор шаблона
+    if THEME == 'cosmic':
+        template_name = 'index_cosmic.html'
+    else:
+        template_name = 'index.html'
     db_sess = db_session.create_session()
     categories = db_sess.query(Recipes.category).distinct().all()
     categories = [cat[0] for cat in categories if cat[0]]
@@ -41,7 +50,7 @@ def index():
     recipes = []
     if selected_category:
         recipes = db_sess.query(Recipes).filter(Recipes.category == selected_category).all()
-    return render_template("index.html", recipes=recipes, categories=categories, selected_category=selected_category, all_allergens=all_allergens)
+    return render_template(template_name, recipes=recipes, categories=categories, selected_category=selected_category, all_allergens=all_allergens, THEME=THEME)
 
 
 @app.route('/register', methods=['GET', 'POST'])
