@@ -113,6 +113,10 @@
         background-color: #c82333 !important; /* темнее при наведении */
         border-color: #c82333 !important;
     }
+    .main-content-spacing {
+    margin-top: 60px !important;
+    margin-bottom: 40px !important;
+    }
     </style>
     <style>
         .navbar-brand-custom {
@@ -132,13 +136,11 @@
 
         .user-name-custom {
             background: linear-gradient(135deg, #4ecdc4, #45b7d1) !important;
-            color: #000000 !important;
+            color: #ffffff !important;
             padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #1565c0;
             font-weight: 500;
             font-size: 0.9rem;
-            margin-left: 10px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -153,28 +155,29 @@
     ">
         <div class="container-fluid">
             <!-- Логотип слева -->
-            <a class="navbar-brand" href="/" style="
+            <span class="navbar-brand" style="
                 font-family: 'Arial', sans-serif;
                 font-weight: 700;
                 font-size: 1.8rem;
                 color: #D4A574 !important;  /* теплый коричневый */
                 text-decoration: none;
+                cursor: default;
             ">
                 🍽️ FOODHUB
-            </a>
+            </span>
 
             <!-- Кнопки справа -->
             <div class="d-flex align-items-center">
                 {% if current_user.is_authenticated %}
                     <!-- Для авторизованных -->
-                    <a class="btn btn-outline-danger btn-sm me-2" href="/logout" style="
+                    <a class="btn btn-outline-danger btn-sm mr-3" href="/logout" style="
                         border-width: 2px;
                         font-weight: 500;
                         padding: 8px 16px;
                     ">
                         Выйти
                     </a>
-                    <a href="/favourites" class="btn btn-warning btn-sm me-2" style="
+                    <a href="/favourites" class="btn btn-warning btn-sm mr-3" style="
                         background-color: #FFD166;
                         border: none;
                         color: #333;
@@ -186,7 +189,7 @@
                     <span class="user-name-custom">{{ current_user.name }}</span>
                 {% else %}
                     <!-- Для гостей -->
-                    <a class="btn btn-info btn-sm me-2" href="/register" style="
+                    <a class="btn btn-info btn-sm mr-3" href="/register" style="
                         background-color: #4ECDC4;
                         border: none;
                         color: white;
@@ -195,7 +198,7 @@
                     ">
                         Регистрация
                     </a>
-                    <a class="btn btn-success btn-sm" href="/login" style="
+                    <a class="btn btn-success btn-sm mr-3" href="/login" style="
                         background-color: #06D6A0;
                         border: none;
                         color: white;
@@ -243,21 +246,17 @@ setTimeout(function() {
 }, 3000);
 </script>
 <script>
-// УДАЛЯЕМ ГРАДИЕНТ И СТАВИМ КАРТИНКИ СИЛОЙ
 document.addEventListener('DOMContentLoaded', function() {
-    // Ждем немного, чтобы все стили применились
     setTimeout(function() {
         const buttons = document.querySelectorAll('.category-buttons a');
 
         buttons.forEach(btn => {
-            // Получаем URL картинки из inline-стиля
             const style = btn.getAttribute('style') || '';
             const match = style.match(/url\(['"]?([^'")]+)/);
 
             if (match && match[1]) {
                 const imageUrl = match[1];
 
-                // СИЛОЙ перезаписываем все background-стили
                 btn.style.cssText = `
                     background-image: url(${imageUrl}) !important;
                     background-size: cover !important;
@@ -285,7 +284,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     transition: all 0.3s ease !important;
                 `;
 
-                // Добавляем затемняющий слой
                 const overlay = document.createElement('div');
                 overlay.style.cssText = `
                     position: absolute;
@@ -308,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Кнопка исправлена:', btn);
             }
         });
-    }, 500); // Даем время на загрузку
+    }, 500);
 });
 </script>
 </body>
