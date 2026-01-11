@@ -1,46 +1,77 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Регистрация</h1>
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.email.label }}<br>
-        {{ form.email(class="form-control", type="email") }}<br>
-        {% for error in form.email.errors %}
-            <p class="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(class="form-control", type="password") }}<br>
-        {% for error in form.password.errors %}
-            <p class="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.password_again.label }}<br>
-        {{ form.password_again(class="form-control", type="password") }}<br>
-        {% for error in form.password_again.errors %}
-            <p class="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.name.label }}<br>
-        {{ form.name(class="form-control") }}<br>
-        {% for error in form.name.errors %}
-            <p class="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-    {{message}}
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0" style="
+            margin-top: 40px;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 165, 116, 0.2);
+        ">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="mb-4 text-center" style="color: #D4A574;">Регистрация</h1>
+
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label fw-medium") }}
+                        {{ form.email(class="form-control form-control-lg", type="email", placeholder="example@mail.com") }}
+                        {% for error in form.email.errors %}
+                            <div class="alert alert-danger mt-2 py-2" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label fw-medium") }}
+                        {{ form.password(class="form-control form-control-lg", type="password", placeholder="Введите пароль") }}
+                        {% for error in form.password.errors %}
+                            <div class="alert alert-danger mt-2 py-2" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password_again.label(class="form-label fw-medium") }}
+                        {{ form.password_again(class="form-control form-control-lg", type="password", placeholder="Пароль") }}
+                        {% for error in form.password_again.errors %}
+                            <div class="alert alert-danger mt-2 py-2" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.name.label(class="form-label fw-medium") }}
+                        {{ form.name(class="form-control form-control-lg", placeholder="Введите своё имя") }}
+                        {% for error in form.name.errors %}
+                            <div class="alert alert-danger mt-2 py-2" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(type="submit", class="btn btn-primary btn-lg", style="
+                            background-color: #4ECDC4;
+                            border: none;
+                            padding: 12px;
+                            font-weight: 600;
+                        ") }}
+                    </div>
+
+                    {% if message %}
+                    <div class="alert alert-info mt-3 text-center">
+                        {{ message }}
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
