@@ -134,14 +134,6 @@
                 1px 1px 0 #000;
         }
 
-        .user-name-custom {
-            background: linear-gradient(135deg, #4ecdc4, #45b7d1) !important;
-            color: #ffffff !important;
-            padding: 6px 12px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
@@ -170,40 +162,62 @@
             <div class="d-flex align-items-center">
                 {% if current_user.is_authenticated %}
                     <!-- Для авторизованных -->
-                    <a class="btn btn-outline-danger btn-sm mr-3" href="/logout" style="
-                        border-width: 2px;
-                        font-weight: 500;
-                        padding: 8px 16px;
+                    <a href="/logout" style="
+                        padding: 10px 30px;
+                        color: #333;
+                        font-size: 0.95rem;
+                        font-weight: 600 !important;
+                        margin-left: 25px;
+                        border-radius: 15px;
+                        border: 1px solid rgba(212, 165, 116, 0.3);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                     ">
                         Выйти
                     </a>
-                    <a href="/favourites" class="btn btn-warning btn-sm mr-3" style="
-                        background-color: #FFD166;
-                        border: none;
+                    <a href="/favourites" style="
+                        padding: 10px 30px;
                         color: #333;
-                        font-weight: 500;
-                        padding: 8px 16px;
+                        font-size: 0.95rem;
+                        font-weight: 600 !important;
+                        margin-left: 25px;
+                        border-radius: 15px;
+                        border: 1px solid rgba(212, 165, 116, 0.3);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                     ">
                         ⭐ Избранное
                     </a>
-                    <span class="user-name-custom">{{ current_user.name }}</span>
+                    <span style="padding: 10px 30px;
+                        background-color: #4DA6FF;
+                        color: white;
+                        font-size: 0.95rem;
+                        font-weight: 600 !important;
+                        margin-left: 25px;
+                        border-radius: 15px;
+                        border: 1px solid rgba(212, 165, 116, 0.3);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">{{ current_user.name }}</span>
                 {% else %}
                     <!-- Для гостей -->
-                    <a class="btn btn-info btn-sm mr-3" href="/register" style="
-                        background-color: #4ECDC4;
-                        border: none;
-                        color: white;
-                        font-weight: 500;
-                        padding: 8px 16px;
+                    <a href="/register" style="
+                        padding: 10px 30px;
+                        color: #333;
+                        font-size: 0.95rem;
+                        font-weight: 600 !important;
+                        margin-left: 25px;
+                        border-radius: 15px;
+                        border: 1px solid rgba(212, 165, 116, 0.3);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                     ">
                         Регистрация
                     </a>
-                    <a class="btn btn-success btn-sm mr-3" href="/login" style="
-                        background-color: #06D6A0;
-                        border: none;
-                        color: white;
-                        font-weight: 500;
-                        padding: 8px 16px;
+                    <a href="/login" style="
+                        padding: 10px 30px;
+                        color: #333;
+                        font-size: 0.95rem;
+                        font-weight: 600 !important;
+                        margin-left: 25px;
+                        border-radius: 15px;
+                        border: 1px solid rgba(212, 165, 116, 0.3);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                     ">
                         Войти
                     </a>
