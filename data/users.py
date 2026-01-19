@@ -20,8 +20,6 @@ class User(SqlAlchemyBase, UserMixin):
         backref='favourited_by_users'
     )
 
-    # news = orm.relationship("News", back_populates='user')
-
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
 

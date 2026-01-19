@@ -9,7 +9,6 @@
           crossorigin="anonymous">
     <title>{{title}}</title>
     <style>
-/* СТИЛИ ДЛЯ КНОПОК КАТЕГОРИЙ - РАБОТАЮТ С btn-primary */
 .category-buttons .btn-primary,
 .category-buttons .category-card {
     display: inline-flex !important;
@@ -146,7 +145,6 @@
         min-height: 80px !important;
     ">
         <div class="container-fluid">
-            <!-- Логотип слева -->
             <span class="navbar-brand" style="
                 font-family: 'Arial', sans-serif;
                 font-weight: 700;
@@ -158,10 +156,8 @@
                 🍽️ FOODHUB
             </span>
 
-            <!-- Кнопки справа -->
             <div class="d-flex align-items-center">
                 {% if current_user.is_authenticated %}
-                    <!-- Для авторизованных -->
                     <a href="/logout" style="
                         padding: 10px 30px;
                         color: #333;
@@ -196,7 +192,6 @@
                         border: 1px solid rgba(212, 165, 116, 0.3);
                         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">{{ current_user.name }}</span>
                 {% else %}
-                    <!-- Для гостей -->
                     <a href="/register" style="
                         padding: 10px 30px;
                         color: #333;
@@ -226,7 +221,6 @@
         </div>
     </nav>
 </header>
-<!-- Begin page content -->
 <main role="main" class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -307,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     transition: background 0.3s ease;
                 `;
 
-                // Перемещаем содержимое поверх overlay
+
                 const content = btn.innerHTML;
                 btn.innerHTML = '';
                 btn.appendChild(overlay);

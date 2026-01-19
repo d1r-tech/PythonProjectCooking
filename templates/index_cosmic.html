@@ -1,10 +1,8 @@
 {% extends "base_cosmic.html" %}  <!-- или "base_cosmic.html" если создали -->
 {% block content %}
 {% if not selected_category %}
-<!-- ⭐⭐⭐ БОЛЬШОЙ КОСМИЧЕСКИЙ ЛОГОТИП ⭐⭐⭐ -->
 <div class="space-logo-container" style="max-width: 600px; margin: 20px auto 40px;">
   <div class="space-logo">
-    <!-- Планета-тарелка -->
     <div class="planet-dish" style="width: 120px; height: 120px; margin: 0 auto 20px;">
       <div class="planet-surface">
         <div class="crater"></div>
@@ -13,7 +11,6 @@
       </div>
     </div>
 
-    <!-- Название -->
     <div class="logo-text">
       <h1 class="main-title" style="font-size: 2.5rem;">FOODHUB</h1>
       <p class="subtitle" style="font-size: 1rem;">Cosmic Cuisine Navigator</p>
@@ -66,7 +63,6 @@
 <h2>Выберите раздел рецептов:</h2>
 <div style="margin: 40px 0;">
     <div style="display: flex; flex-wrap: wrap; gap: 25px; justify-content: center;">
-        <!-- 1. Завтраки -->
         <a href="/?category=Завтраки"
            style="display: block !important; width: 300px !important; height: 100px !important;
                   background: url('/static/images/breakfast.jpg') center/cover no-repeat !important;
@@ -79,7 +75,6 @@
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
-        <!-- 2. Основные блюда -->
         <a href="/?category=Основные блюда"
            style="display: block !important; width: 300px !important; height: 100px !important;
                   background: url('/static/images/hotdishes.jpg') center/cover no-repeat !important;
@@ -92,7 +87,6 @@
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
-        <!-- 3. Десерты -->
         <a href="/?category=Десерты"
            style="display: block !important; width: 300px !important; height: 100px !important;
                   background: url('/static/images/desserts.jpg') center/cover no-repeat !important;
@@ -105,7 +99,6 @@
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
-        <!-- 4. Супы -->
         <a href="/?category=Супы"
            style="display: block !important; width: 300px !important; height: 100px !important;
                   background: url('/static/images/soup.jpg') center/cover no-repeat !important;
@@ -117,8 +110,7 @@
             <span style="position: relative; z-index: 2;">🥣 Гравитационные супы 🥣</span>
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
-
-        <!-- 5. Напитки -->
+>
         <a href="/?category=Напитки"
            style="display: block !important; width: 300px !important; height: 100px !important;
                   background: url('/static/images/drinks.jpg') center/cover no-repeat !important;
@@ -134,7 +126,6 @@
 </div>
 
 {% if selected_category %}
-<!-- КОСМИЧЕСКИЙ КОМПАКТНЫЙ ЛОГОТИП -->
 <div style="margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid rgba(74, 144, 226, 0.2);">
     <a href="/" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(10, 14, 42, 0.9); border-radius: 20px; border: 1px solid rgba(74, 144, 226, 0.5); box-shadow: 0 0 10px rgba(0, 150, 255, 0.2);">
         <span style="font-size: 20px; animation: rotate 20s infinite linear;">🪐</span>
@@ -142,7 +133,6 @@
     </a>
 </div>
 {% endif %}
-<!-- БЛОК РЕЦЕПТОВ -->
 <div class="recipes-section">
     <h3>{{ selected_category }}</h3>
     <div id="recipesList">
@@ -182,37 +172,30 @@
     </div>
 </div>
 {% endif %}
-<!-- JavaScript для фильтрации -->
+
 <script>
 let selectedAllergens = [];
 
 function applyFilter() {
-    // Собираем выбранные аллергены
     selectedAllergens = Array.from(document.querySelectorAll('.allergen-checkbox:checked'))
         .map(checkbox => checkbox.value);
 
-    // Обновляем отображение выбранных аллергенов
     updateSelectedAllergensDisplay();
 
-    // Применяем фильтр
     filterRecipes();
 
-    // Закрываем dropdown
     $('.dropdown-menu').removeClass('show');
 }
 
 function clearFilter() {
-    // Сбрасываем чекбоксы
     document.querySelectorAll('.allergen-checkbox').forEach(checkbox => {
         checkbox.checked = false;
     });
 
-    // Сбрасываем фильтр
     selectedAllergens = [];
     updateSelectedAllergensDisplay();
     filterRecipes();
 
-    // Закрываем dropdown
     $('.dropdown-menu').removeClass('show');
 }
 
@@ -239,7 +222,6 @@ function filterRecipes() {
     });
 }
 </script>
-<!-- Полоска-уведомление сверху -->
 <div id="registrationAlert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;">
     <div style="background: #e8e8e8; color: #333; padding: 15px 20px; border-bottom: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
@@ -253,15 +235,12 @@ function filterRecipes() {
     </div>
 </div>
 
-<!-- JavaScript -->
 <script>
 function showRegistrationAlert() {
     const alertDiv = document.getElementById('registrationAlert');
 
-    // Показываем уведомление
     alertDiv.style.display = 'block';
 
-    // Автоматическое скрытие через 4 секунды
     setTimeout(() => {
         hideRegistrationAlert();
     }, 4000);
@@ -286,7 +265,6 @@ function hideRegistrationAlert() {
         opacity: 1;
     }
 }
-/* Затемнение фона (опционально) */
 #registrationAlert::before {
     content: '';
     position: fixed;
