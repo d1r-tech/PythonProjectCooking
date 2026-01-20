@@ -40,14 +40,10 @@ DEFAULT_ALLERGENS = [
     "Белая рыба"
 ]
 
-
 def create_default_allergens(db_sess):
     from .allergens import Allergen
-    # Очищаем старые аллергены
     db_sess.query(Allergen).delete()
-    # Создаем новые аллергены
     for allergen_title in DEFAULT_ALLERGENS:
-        # Проверяем что название не пустое
         if allergen_title and allergen_title.strip():
             allergen = Allergen(title=allergen_title.strip())
             db_sess.add(allergen)

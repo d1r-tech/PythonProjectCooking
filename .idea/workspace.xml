@@ -6,6 +6,19 @@
   <component name="ChangeListManager">
     <list default="true" id="db5e6843-7d42-4163-9371-785c280351f4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_recipes.py" beforeDir="false" afterPath="$PROJECT_DIR$/check_recipes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/default_allergens.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/default_allergens.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/dep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rename_categories.py" beforeDir="false" afterPath="$PROJECT_DIR$/rename_categories.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/add_allergen_to_recipe.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/add_allergen_to_recipe.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/fix_recipe.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/fix_recipe.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/rename_categories.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/rename_categories.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/update_recipes.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_recipes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base_cosmic.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base_cosmic.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index_cosmic.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index_cosmic.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

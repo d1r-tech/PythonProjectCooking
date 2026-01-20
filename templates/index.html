@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- ⭐⭐⭐ КОМПАКТНЫЙ ЛОГОТИП В УГЛУ (ТОЛЬКО В РАЗДЕЛАХ) ⭐⭐⭐ -->
+
 {% if selected_category %}
 <div style="
     margin-bottom: 25px;
@@ -30,7 +30,6 @@
 </div>
 
 <style>
-/* Анимация для кнопки (опционально) */
 a[href="/"]:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -46,8 +45,6 @@ a[href="/"]:hover {
 </style>
 {% endif %}
 
-
-<!-- ⭐⭐⭐ ВАШ СТАРЫЙ КОД НИЖЕ (БЕЗ ИЗМЕНЕНИЙ) ⭐⭐⭐ -->
 <style>
 .category-buttons {
     display: flex;
@@ -57,7 +54,6 @@ a[href="/"]:hover {
     justify-content: center;
 }
 </style>
-<!-- ФИЛЬТР ПО АЛЛЕРГЕНАМ -->
 {% if selected_category %}
 <div class="allergen-filter mb-4">
     <label class="form-label">Исключить аллергены:</label>
@@ -72,7 +68,6 @@ a[href="/"]:hover {
             border: 2px solid rgba(212, 165, 116, 0.3) !important;
             box-shadow: 0 6px 25px rgba(212, 165, 116, 0.1) !important;
         ">
-            <!-- Контейнер с ЧЕТКИМИ стилями -->
             <div style="
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
@@ -82,7 +77,6 @@ a[href="/"]:hover {
                 padding-right: 10px !important;
                 padding-bottom: 10px !important;
             ">
-                <!-- ⭐ СОРТИРОВКА ПО АЛФАВИТУ ⭐ -->
                 {% for allergen in all_allergens|sort(attribute='title') %}
                 <div style="
                     display: flex !important;
@@ -132,16 +126,14 @@ a[href="/"]:hover {
 {% endif %}
 
 {% if not selected_category %}
-<!-- БЛОК ВЫБОРА РАЗДЕЛОВ -->
 <h2 class="main-content-spacing">Выберите раздел рецептов:</h2>
 <div style="margin: 40px 0;">
     <div style="display: flex; flex-wrap: wrap; gap: 25px; justify-content: center;">
-        <!-- 1. Завтраки -->
         <a href="/?category=Завтраки"
-           style="display: block !important; width: 300px !important; height: 100px !important;
+           style="display: block !important; width: 300px !important; height: 150px !important;
                   background: url('/static/images/breakfast.jpg') center/cover no-repeat !important;
                   color: white !important; text-decoration: none !important; border-radius: 12px !important;
-                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 150px !important;
                   text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
                   font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
                   position: relative !important; overflow: hidden !important;">
@@ -149,12 +141,11 @@ a[href="/"]:hover {
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
-        <!-- 2. Основные блюда -->
         <a href="/?category=Основные блюда"
-           style="display: block !important; width: 300px !important; height: 100px !important;
+           style="display: block !important; width: 300px !important; height: 150px !important;
                   background: url('/static/images/hotdishes.jpg') center/cover no-repeat !important;
                   color: white !important; text-decoration: none !important; border-radius: 12px !important;
-                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 150px !important;
                   text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
                   font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
                   position: relative !important; overflow: hidden !important;">
@@ -162,12 +153,11 @@ a[href="/"]:hover {
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
-        <!-- 3. Десерты -->
         <a href="/?category=Десерты"
-           style="display: block !important; width: 300px !important; height: 100px !important;
+           style="display: block !important; width: 300px !important; height: 150px !important;
                   background: url('/static/images/desserts.jpg') center/cover no-repeat !important;
                   color: white !important; text-decoration: none !important; border-radius: 12px !important;
-                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 150px !important;
                   text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
                   font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
                   position: relative !important; overflow: hidden !important;">
@@ -175,12 +165,11 @@ a[href="/"]:hover {
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
-        <!-- 4. Супы -->
         <a href="/?category=Супы"
-           style="display: block !important; width: 300px !important; height: 100px !important;
+           style="display: block !important; width: 300px !important; height: 150px !important;
                   background: url('/static/images/soup.jpg') center/cover no-repeat !important;
                   color: white !important; text-decoration: none !important; border-radius: 12px !important;
-                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 150px !important;
                   text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
                   font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
                   position: relative !important; overflow: hidden !important;">
@@ -188,12 +177,11 @@ a[href="/"]:hover {
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 42, 0.4); z-index: 1;"></div>
         </a>
 
-        <!-- 5. Напитки -->
         <a href="/?category=Напитки"
-           style="display: block !important; width: 300px !important; height: 100px !important;
+           style="display: block !important; width: 300px !important; height: 150px !important;
                   background: url('/static/images/drinks.jpg') center/cover no-repeat !important;
                   color: white !important; text-decoration: none !important; border-radius: 12px !important;
-                  font-size: 18px !important; text-align: center !important; line-height: 100px !important;
+                  font-size: 18px !important; text-align: center !important; line-height: 150px !important;
                   text-shadow: 1px 1px 2px black !important; border: 2px solid rgba(255, 255, 255, 0.8) !important;
                   font-weight: bold !important; box-shadow: 0 8px 25px rgba(0, 150, 255, 0.3) !important;
                   position: relative !important; overflow: hidden !important;">
@@ -204,7 +192,6 @@ a[href="/"]:hover {
 </div>
 
 {% else %}
-<!-- БЛОК РЕЦЕПТОВ -->
 <div class="recipes-section">
     <h3>{{ selected_category }}</h3>
     <div id="recipesList">
@@ -244,37 +231,29 @@ a[href="/"]:hover {
     </div>
 </div>
 {% endif %}
-<!-- JavaScript для фильтрации -->
 <script>
 let selectedAllergens = [];
 
 function applyFilter() {
-    // Собираем выбранные аллергены
     selectedAllergens = Array.from(document.querySelectorAll('.allergen-checkbox:checked'))
         .map(checkbox => checkbox.value);
 
-    // Обновляем отображение выбранных аллергенов
     updateSelectedAllergensDisplay();
 
-    // Применяем фильтр
     filterRecipes();
 
-    // Закрываем dropdown
     $('.dropdown-menu').removeClass('show');
 }
 
 function clearFilter() {
-    // Сбрасываем чекбоксы
     document.querySelectorAll('.allergen-checkbox').forEach(checkbox => {
         checkbox.checked = false;
     });
 
-    // Сбрасываем фильтр
     selectedAllergens = [];
     updateSelectedAllergensDisplay();
     filterRecipes();
 
-    // Закрываем dropdown
     $('.dropdown-menu').removeClass('show');
 }
 
@@ -301,7 +280,6 @@ function filterRecipes() {
     });
 }
 </script>
-<!-- Полоска-уведомление сверху -->
 <div id="registrationAlert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;">
     <div style="background: #e8e8e8; color: #333; padding: 15px 20px; border-bottom: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
@@ -315,15 +293,12 @@ function filterRecipes() {
     </div>
 </div>
 
-<!-- JavaScript -->
 <script>
 function showRegistrationAlert() {
     const alertDiv = document.getElementById('registrationAlert');
 
-    // Показываем уведомление
     alertDiv.style.display = 'block';
 
-    // Автоматическое скрытие через 4 секунды
     setTimeout(() => {
         hideRegistrationAlert();
     }, 4000);
@@ -348,7 +323,6 @@ function hideRegistrationAlert() {
         opacity: 1;
     }
 }
-/* Затемнение фона (опционально) */
 #registrationAlert::before {
     content: '';
     position: fixed;
