@@ -8,6 +8,7 @@
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
           crossorigin="anonymous">
     <title>{{title}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
     <style>
 .category-buttons .btn-primary,
 .category-buttons .category-card {
@@ -317,5 +318,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 </script>
+ <div class="chat-button-container">
+        <button id="chat-button" onclick="toggleChat()">
+            🤖 AI Ассистент
+        </button>
+    </div>
+
+    <!-- Контейнер для виджета чата -->
+    <div id="chat-widget-container"></div>
+
+    <script>
+        let chatVisible = false;
+
+        async function toggleChat() {
+            console.log('Toggle chat called');
+
+            const container = document.getElementById('chat-widget-container');
+
+            if (!chatVisible) {
+                // Показываем чат
+                try {
+                    const response = await fetch('/chat/toggle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        }
+                    });
+
+                    if (response.ok) {
+                        const html = await response.text();
+                        container.innerHTML = html;
+                        chatVisible = true;
+                        console.log('Chat opened successfully');
+                    } else {
+                        console.error('Server error:', response.status);
+                        container.innerHTML = '<div style="position:fixed;bottom:80px;right:20px;background:red;color:white;padding:20px;">Ошибка загрузки чата</div>';
+                    }
+                } catch (error) {
+                    console.error('Network error:', error);
+                    // Фолбэк - простой чат
+                    container.innerHTML = `
+                    <div style="position: fixed; bottom: 80px; right: 20px; width: 350px; background: white; border: 2px solid #f56565; border-radius: 10px; padding: 20px; z-index: 9998;">
+                        <h3>🤖 AI Ассистент</h3>
+                        <div id="chat-messages" style="height: 200px; overflow-y: auto; margin: 10px 0;">
+                            <p>Привет! Простой чат работает.</p>
+                        </div>
+                        <input type="text" id="chat-input" placeholder="Введите сообщение..." style="width: 70%; padding: 8px;">
+                        <button onclick="sendMessage()" style="background: #f56565; color: white; padding: 8px 15px; border: none;">Отправить</button>
+                        <button onclick="toggleChat()" style="float: right;">✕</button>
+                    </div>`;
+                    chatVisible = true;
+                }
+            } else {
+                // Скрываем чат
+                container.innerHTML = '';
+                chatVisible = false;
+            }
+        }
+
+        // Функция для простого чата (фолбэк)
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messages = document.getElementById('chat-messages');
+
+            if (input.value.trim()) {
+                messages.innerHTML += `<p><strong>Вы:</strong> ${input.value}</p>`;
+                input.value = '';
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+
+        // Проверяем загрузку
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Chat button loaded:', document.getElementById('chat-button'));
+        });
+    </script>
 </body>
 </html>

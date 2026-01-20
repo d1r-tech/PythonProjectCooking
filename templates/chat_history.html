@@ -1,0 +1,98 @@
+{% if messages %}
+    {% for msg in messages %}
+        <div class="chat-message {% if msg.role == 'user' %}user-message{% else %}ai-message{% endif %}">
+            <div class="message-avatar">
+                {% if msg.role == 'user' %}👤{% else %}🤖{% endif %}
+            </div>
+            <div class="message-content">
+                <div class="message-text">{{ msg.content|safe }}</div>
+                <div class="message-time">
+                    {{ loop.index }} сообщение
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="welcome-message">
+        <p>Привет! Я ваш AI-ассистент по кулинарии. Могу помочь с рецептами, подсказать замену ингредиентов или дать совет по приготовлению. Чем могу помочь?</p>
+    </div>
+{% endif %}
+
+<style>
+    .welcome-message {
+        background: white;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+        color: #4b5563;
+        margin-bottom: 16px;
+    }
+
+    /* Повторяем стили сообщений для гарантии работы */
+    .chat-message {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-message { flex-direction: row-reverse; }
+    .ai-message { flex-direction: row; }
+
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .user-message .message-avatar {
+        background: #f56565;
+        color: white;
+    }
+
+    .ai-message .message-avatar {
+        background: #38b2ac;
+        color: white;
+    }
+
+    .message-content { max-width: 70%; }
+
+    .message-text {
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    .user-message .message-text {
+        background: #f56565;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .ai-message .message-text {
+        background: white;
+        color: #1f2937;
+        border: 1px solid #e5e7eb;
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-time {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 4px;
+        text-align: {% if msg.role == 'user' %}right{% else %}left{% endif %};
+    }
+</style>
