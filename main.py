@@ -183,6 +183,6 @@ def get_chat_history_route():
     messages = history[1:] if len(history) > 1 else []
 
     return render_template('templates/chat_history.html', messages=messages)
-
+#jfjf
 if __name__ == '__main__':
     app.run(port=8091, host='127.0.0.1')
