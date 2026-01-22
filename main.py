@@ -10,6 +10,10 @@ from forms.user import RegisterForm, LoginForm
 #from openai import OpenAI
 from data.default_recipes import create_default_recipes
 import os
+from flask_htmx import HTMX
+import requests
+import json
+from data.chat import get_user_id, get_chat_history, send_to_deepseek, clear_chat_history
 
 # client = OpenAI(api_key="sk-2ac11b4f4b4142f8ae0e93bafe291802", base_url="https://api.deepseek.com")
 
@@ -17,6 +21,8 @@ app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = '65432456uijhgfdsxcvbntghigfeloghlfgogug36364545464737re5dikkfuytotglbligjuftugitlgolgugtu'
 login_manager = LoginManager()
 login_manager.init_app(app)
+htmx = HTMX(app)
+app.config['DEEPSEEK_API_KEY'] = 'sk-2ac11b4f4b4142f8ae0e93bafe291802'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -132,5 +138,51 @@ def remove_from_favourites(recipe_id):
         db_sess.close()
     return redirect(request.referrer or '/')
 
+
+@app.route('/chat/toggle', methods=['POST'])
+def toggle_chat():
+    """Показать/скрыть чат виджет"""
+    return render_template('templates/chat_widget.html', visible=True)
+
+
+@app.route('/chat/send', methods=['POST'])
+def send_message():
+    """Отправить сообщение в DeepSeek"""
+    message = request.form.get('message', '').strip()
+    if not message:
+        return render_template('templates/chat_message.html',
+                               message="Сообщение не может быть пустым",
+                               is_user=False)
+
+    user_id = get_user_id()
+    ai_response, success = send_to_deepseek(message, user_id)
+
+    return render_template('templates/chat_message.html',
+                           message=ai_response,
+                           is_user=False)
+
+
+@app.route('/chat/clear', methods=['POST'])
+def clear_chat():
+    """Очистить историю чата"""
+    user_id = get_user_id()
+    clear_chat_history(user_id)
+
+    return render_template('templates/chat_message.html',
+                           message="История очищена. Чем могу помочь?",
+                           is_user=False)
+
+
+@app.route('/chat/history', methods=['GET'])
+def get_chat_history_route():
+    """Получить всю историю чата"""
+    user_id = get_user_id()
+    history = get_chat_history(user_id)
+
+    # Пропускаем первое приветственное сообщение
+    messages = history[1:] if len(history) > 1 else []
+
+    return render_template('templates/chat_history.html', messages=messages)
+#jfjf
 if __name__ == '__main__':
     app.run(port=8091, host='127.0.0.1')
