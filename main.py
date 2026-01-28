@@ -142,7 +142,7 @@ def remove_from_favourites(recipe_id):
 @app.route('/chat/toggle', methods=['POST'])
 def toggle_chat():
     """Показать/скрыть чат виджет"""
-    return render_template('templates/chat_widget.html', visible=True)
+    return render_template('chat_widget.html', visible=True)
 
 
 @app.route('/chat/send', methods=['POST'])
@@ -150,14 +150,14 @@ def send_message():
     """Отправить сообщение в DeepSeek"""
     message = request.form.get('message', '').strip()
     if not message:
-        return render_template('templates/chat_message.html',
+        return render_template('chat_message.html',
                                message="Сообщение не может быть пустым",
                                is_user=False)
 
     user_id = get_user_id()
     ai_response, success = send_to_deepseek(message, user_id)
 
-    return render_template('templates/chat_message.html',
+    return render_template('chat_message.html',
                            message=ai_response,
                            is_user=False)
 
@@ -168,7 +168,7 @@ def clear_chat():
     user_id = get_user_id()
     clear_chat_history(user_id)
 
-    return render_template('templates/chat_message.html',
+    return render_template('chat_message.html',
                            message="История очищена. Чем могу помочь?",
                            is_user=False)
 
@@ -182,7 +182,66 @@ def get_chat_history_route():
     # Пропускаем первое приветственное сообщение
     messages = history[1:] if len(history) > 1 else []
 
-    return render_template('templates/chat_history.html', messages=messages)
+    return render_template('chat_history.html', messages=messages)
+
+
+@app.route('/ai_chat')
+def ai_chat_page():
+    """Отдельная страница с чатом"""
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>AI Ассистент</title>
+        <style>
+            body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
+            #chat { border: 2px solid #f56565; border-radius: 10px; padding: 20px; }
+            #messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+            input { width: 70%; padding: 10px; }
+            button { padding: 10px 20px; background: #f56565; color: white; border: none; }
+        </style>
+    </head>
+    <body>
+        <h1>🤖 AI Ассистент</h1>
+        <div id="chat">
+            <div id="messages">
+                <p><strong>Ассистент:</strong> Привет! Задайте вопрос о рецептах</p>
+            </div>
+            <input type="text" id="message" placeholder="Введите сообщение...">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+
+        <script>
+        async function sendMessage() {
+            const input = document.getElementById('message');
+            const messages = document.getElementById('messages');
+
+            if (!input.value.trim()) return;
+
+            // Показываем сообщение
+            messages.innerHTML += `<p><strong>Вы:</strong> ${input.value}</p>`;
+
+            // Отправляем
+            const response = await fetch('/chat/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'message=' + encodeURIComponent(input.value)
+            });
+
+            const html = await response.text();
+            messages.innerHTML += html;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Enter для отправки
+        document.getElementById('message').onkeypress = function(e) {
+            if (e.key === 'Enter') sendMessage();
+        };
+        </script>
+    </body>
+    </html>
+    '''
 #jfjf
 if __name__ == '__main__':
     app.run(port=8091, host='127.0.0.1')
