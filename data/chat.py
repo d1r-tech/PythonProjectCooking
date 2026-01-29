@@ -40,124 +40,130 @@ def save_chat_history(user_id, history):
     user_chats[user_id] = history
 
 
-def send_to_deepseek(message, user_id):
-    """Отправить сообщение в DeepSeek API - с улучшенной обработкой ошибок"""
-    print(f"🔄 Отправка в DeepSeek: '{message[:50]}...'")
+def send_to_openrouter(message, user_id):
+    """Отправить сообщение в OpenRouter API - С ПОДРОБНОЙ ОТЛАДКОЙ"""
+    print(f"🔄 Отправка в OpenRouter: '{message}'")
 
     history = get_chat_history(user_id)
+
+    # Проверка что history это список
+    if not isinstance(history, list):
+        print(f"⚠️ История не список! Исправляем...")
+        history = [{"role": "assistant", "content": "История сброшена."}]
+
+    # Добавляем сообщение пользователя
     history.append({"role": "user", "content": message})
 
     try:
+        api_key = current_app.config.get('OPENROUTER_API_KEY')
+        print(f"API ключ (первые 10 символов): {api_key[:10] if api_key else 'НЕТ'}...")
+
         headers = {
-            "Authorization": f"Bearer {current_app.config['DEEPSEEK_API_KEY']}",
-            "Content-Type": "application/json"
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
         }
 
-        # Упрощенный payload
         payload = {
-            "model": "deepseek-chat",
+            "model": "meta-llama/llama-3.2-3b-instruct:free",
             "messages": [
-                {"role": "system", "content": "You are a helpful cooking assistant."},
+                {"role": "system", "content": "Ты кулинарный помощник. Отвечай кратко по-русски."},
                 {"role": "user", "content": message}
             ],
-            "max_tokens": 500
+            "max_tokens": 300
         }
 
-        print(f"Отправляю запрос на DeepSeek API...")
-        print(f"Headers: {headers}")
-        print(f"Payload keys: {payload.keys()}")
+        print(f"Отправляю запрос к OpenRouter...")
 
         response = requests.post(
-            "https://api.deepseek.com/v1/chat/completions",
+            "https://openrouter.ai/api/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=30
+            timeout=15
         )
 
-        print(f"Статус ответа: {response.status_code}")
-        print(f"Заголовки ответа: {dict(response.headers)}")
+        print(f"Статус: {response.status_code}")
+        print(f"Тип контента: {response.headers.get('Content-Type')}")
+        print(f"Первые 200 символов ответа: {response.text[:200]}")
 
+        # ПРОВЕРКА ЧТО ВЕРНУЛОСЬ
         if response.status_code == 200:
-            data = response.json()
-            print(f"Ответ получен, структура: {data.keys()}")
+            try:
+                data = response.json()
+                print(f"JSON успешно распарсен. Ключи: {data.keys()}")
 
-            ai_response = data['choices'][0]['message']['content']
-            print(f"AI ответ (первые 100 символов): {ai_response[:100]}...")
+                if 'choices' in data and len(data['choices']) > 0:
+                    ai_response = data['choices'][0]['message']['content']
+                    print(f"AI ответ: {ai_response[:100]}...")
 
-            history.append({"role": "assistant", "content": ai_response})
-            save_chat_history(user_id, history)
+                    # Добавляем ответ
+                    history.append({"role": "assistant", "content": ai_response})
+                    save_chat_history(user_id, history)
 
-            return ai_response, True
+                    return ai_response, True
+                else:
+                    print(f"❌ Нет choices в ответе. Весь ответ: {data}")
+                    raise ValueError("Нет choices в ответе API")
 
-        elif response.status_code == 402:
-            error_msg = "⚠️ Ошибка оплаты API. Проверьте баланс на platform.deepseek.com"
-            print(error_msg)
-
-        elif response.status_code == 401:
-            error_msg = "🔑 Неверный API ключ. Проверьте ключ на platform.deepseek.com"
-            print(error_msg)
-
-        elif response.status_code == 429:
-            error_msg = "⏰ Лимит запросов превышен. Подождите немного."
-            print(error_msg)
+            except json.JSONDecodeError as e:
+                print(f"❌ Ошибка парсинга JSON. Ответ был: {response.text[:500]}")
+                raise
 
         else:
-            error_msg = f"❌ Ошибка API {response.status_code}: {response.text[:200]}"
-            print(error_msg)
-
-        # Фолбэк ответ
-        fallback_response = f"""
-        Технические трудности с AI ассистентом (ошибка {response.status_code}).<br><br>
-
-        <strong>Что вы можете сделать:</strong><br>
-        1. Проверить баланс на <a href="https://platform.deepseek.com" target="_blank">platform.deepseek.com</a><br>
-        2. Попробовать позже<br>
-        3. Использовать поиск по рецептам на сайте<br><br>
-
-        <em>А пока вот ответ на ваше сообщение "{message}":<br>
-        Попробуйте поискать рецепт в нашей базе данных!</em>
-        """
-
-        history.append({"role": "assistant", "content": fallback_response})
-        save_chat_history(user_id, history)
-
-        return fallback_response, False
+            print(f"❌ Ошибка HTTP {response.status_code}")
+            print(f"Полный ответ: {response.text}")
+            raise Exception(f"HTTP ошибка {response.status_code}")
 
     except Exception as e:
-        error_msg = f"🚫 Исключение: {type(e).__name__}: {str(e)}"
-        print(error_msg)
+        print(f"🚫 Исключение: {type(e).__name__}: {str(e)}")
 
-        fallback_response = f"""
-        Техническая ошибка подключения.<br><br>
+        # ЛОКАЛЬНЫЙ ОТВЕТ ПРИ ЛЮБОЙ ОШИБКЕ
+        local_response = get_local_response(message)
+        print(f"Использую локальный ответ: {local_response[:50]}...")
 
-        <strong>Что вы написали:</strong> "{message}"<br><br>
-
-        <em>Пока AI ассистент настраивается, вы можете:</em><br>
-        • Использовать поиск по категориям<br>
-        • Посмотреть избранные рецепты<br>
-        • Попробовать позже
-        """
-
-        return fallback_response, False
-        if response.status_code == 200:
-            data = response.json()
-            ai_response = data['choices'][0]['message']['content']
-
-            history.append({"role": "assistant", "content": ai_response})
+        # СОХРАНЯЕМ В ИСТОРИЮ
+        if isinstance(history, list):
+            history.append({"role": "assistant", "content": local_response})
             save_chat_history(user_id, history)
 
-            return ai_response, True
-        else:
-            error_msg = f"Ошибка API: {response.status_code}"
-            history.append({"role": "assistant", "content": error_msg})
-            save_chat_history(user_id, history)
-            return error_msg, False
+        return local_response, False
 
-    except Exception as e:
-        error_msg = f"Ошибка соединения: {str(e)}"
-        history.append({"role": "assistant", "content": error_msg})
-        save_chat_history(user_id, history)
-        return error_msg, False
+def send_to_ai(message, user_id):
+    """Отправка сообщения в AI (автоматически выбирает провайдера)"""
+    # Сначала пробуем OpenRouter
+    response, success = send_to_openrouter(message, user_id)
+
+    if not success:
+        # Если OpenRouter не сработал, пробуем локальные ответы
+        response = get_local_response(message)
+        save_chat_history(user_id, message)
+
+    return response, success
+
+
+
+def get_local_response(message):
+    """Локальные ответы если API не работает"""
+    message_lower = message.lower()
+
+    responses = {
+        "привет": "Привет! Я кулинарный помощник. Задайте вопрос о рецептах.",
+        "рецепт": "Выберите категорию: Завтраки, Основные блюда, Десерты, Супы, Напитки.",
+        "как приготовить": "Опишите блюдо, и я подскажу или найду похожий рецепт!",
+        "аллерг": "В фильтрах можно исключить аллергены: орехи, молоко, глютен и др.",
+        "вегетариан": "У нас есть вегетарианские рецепты! Выберите категорию.",
+        "быстро": "Для быстрых рецептов посмотрите Завтраки или Основные блюда.",
+        "десерт": "В категории Десерты найдете торты, пироги, печенье.",
+        "суп": "В категории Супы есть различные первые блюда.",
+        "напиток": "В категории Напитки найдете коктейли, чаи, кофейные рецепты.",
+        "избранн": "Добавляйте рецепты в избранное сердечком ★",
+        "спасибо": "Пожалуйста! Обращайтесь ещё 😊",
+    }
+
+    for key, answer in responses.items():
+        if key in message_lower:
+            return answer
+
+    return f"""Я кулинарный помощник. Вы спросили: "{message}"\n\nПопробуйте:\n• Выбрать категорию рецептов\n• Использовать фильтры\n• Посмотреть избранное"""
 
 
 def clear_chat_history(user_id):

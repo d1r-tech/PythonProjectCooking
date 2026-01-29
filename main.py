@@ -13,7 +13,7 @@ import os
 from flask_htmx import HTMX
 import requests
 import json
-from data.chat import get_user_id, get_chat_history, send_to_deepseek, clear_chat_history
+from data.chat import get_user_id, get_chat_history, send_to_ai, clear_chat_history
 
 # client = OpenAI(api_key="sk-2ac11b4f4b4142f8ae0e93bafe291802", base_url="https://api.deepseek.com")
 
@@ -22,7 +22,8 @@ app.config['SECRET_KEY'] = '65432456uijhgfdsxcvbntghigfeloghlfgogug3636454546473
 login_manager = LoginManager()
 login_manager.init_app(app)
 htmx = HTMX(app)
-app.config['DEEPSEEK_API_KEY'] = 'sk-2ac11b4f4b4142f8ae0e93bafe291802'
+app.config['OPENROUTER_API_KEY'] = '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'
+app.config['OPENROUTER_API_URL'] = 'https://openrouter.ai/api/v1'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -138,24 +139,20 @@ def remove_from_favourites(recipe_id):
         db_sess.close()
     return redirect(request.referrer or '/')
 
-
-@app.route('/chat/toggle', methods=['POST'])
-def toggle_chat():
-    """Показать/скрыть чат виджет"""
-    return render_template('chat_widget.html', visible=True)
-
-
 @app.route('/chat/send', methods=['POST'])
 def send_message():
-    """Отправить сообщение в DeepSeek"""
+    """Отправить сообщение в AI"""
     message = request.form.get('message', '').strip()
+
     if not message:
         return render_template('chat_message.html',
                                message="Сообщение не может быть пустым",
                                is_user=False)
 
     user_id = get_user_id()
-    ai_response, success = send_to_deepseek(message, user_id)
+
+    # Используем новую функцию
+    ai_response, success = send_to_ai(message, user_id)
 
     return render_template('chat_message.html',
                            message=ai_response,
@@ -184,64 +181,10 @@ def get_chat_history_route():
 
     return render_template('chat_history.html', messages=messages)
 
-
 @app.route('/ai_chat')
-def ai_chat_page():
-    """Отдельная страница с чатом"""
-    return '''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>AI Ассистент</title>
-        <style>
-            body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
-            #chat { border: 2px solid #f56565; border-radius: 10px; padding: 20px; }
-            #messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
-            input { width: 70%; padding: 10px; }
-            button { padding: 10px 20px; background: #f56565; color: white; border: none; }
-        </style>
-    </head>
-    <body>
-        <h1>🤖 AI Ассистент</h1>
-        <div id="chat">
-            <div id="messages">
-                <p><strong>Ассистент:</strong> Привет! Задайте вопрос о рецептах</p>
-            </div>
-            <input type="text" id="message" placeholder="Введите сообщение...">
-            <button onclick="sendMessage()">Отправить</button>
-        </div>
+def ai_chat():
+    """Страница AI чата"""
+    return render_template('ai_chat.html')
 
-        <script>
-        async function sendMessage() {
-            const input = document.getElementById('message');
-            const messages = document.getElementById('messages');
-
-            if (!input.value.trim()) return;
-
-            // Показываем сообщение
-            messages.innerHTML += `<p><strong>Вы:</strong> ${input.value}</p>`;
-
-            // Отправляем
-            const response = await fetch('/chat/send', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: 'message=' + encodeURIComponent(input.value)
-            });
-
-            const html = await response.text();
-            messages.innerHTML += html;
-            input.value = '';
-            messages.scrollTop = messages.scrollHeight;
-        }
-
-        // Enter для отправки
-        document.getElementById('message').onkeypress = function(e) {
-            if (e.key === 'Enter') sendMessage();
-        };
-        </script>
-    </body>
-    </html>
-    '''
-#jfjf
 if __name__ == '__main__':
     app.run(port=8091, host='127.0.0.1')
