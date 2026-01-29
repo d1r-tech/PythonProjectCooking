@@ -8,7 +8,7 @@ def fix_recipe():
     db_sess = db_session.create_session()
     try:
         recipe = db_sess.query(Recipes).filter(
-            Recipes.title == "Глазунья"
+            Recipes.title == "Тост с авокадо"
         ).first()
 
         if not recipe:
@@ -17,7 +17,7 @@ def fix_recipe():
 
         print(f"Исправляем рецепт: {recipe.title}")
 
-        recipe.category = "Утренние планеты 🪐"
+        recipe.category = "Завтраки"
         print(f"Категория изменена на: {recipe.category}")
 
         recipe.allergens.clear()
