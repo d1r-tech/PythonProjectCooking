@@ -75,7 +75,7 @@ def send_to_openrouter(message, user_id):
         print(f"Отправляю запрос к OpenRouter...")
 
         response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
+            "https://openrouter.ai/api/v1",
             headers=headers,
             json=payload,
             timeout=15
