@@ -22,8 +22,9 @@ app.config['SECRET_KEY'] = '65432456uijhgfdsxcvbntghigfeloghlfgogug3636454546473
 login_manager = LoginManager()
 login_manager.init_app(app)
 htmx = HTMX(app)
-app.config['OPENROUTER_API_KEY'] = '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'
-app.config['OPENROUTER_API_URL'] = 'https://openrouter.ai/api/v1'
+app.config['DEEPSEEK_API_KEY'] = 'sk-9a1fadff540847dc9f98c343df501e25'
+app.config['DEEPSEEK_API_URL'] = 'https://api.deepseek.com/chat/completions'
+app.config['DEEPSEEK_MODEL'] = 'deepseek-chat'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -139,6 +140,7 @@ def remove_from_favourites(recipe_id):
         db_sess.close()
     return redirect(request.referrer or '/')
 
+
 @app.route('/chat/send', methods=['POST'])
 def send_message():
     """Отправить сообщение в AI"""
@@ -151,12 +153,26 @@ def send_message():
 
     user_id = get_user_id()
 
-    # Используем новую функцию
-    ai_response, success = send_to_ai(message, user_id)
+    try:
+        # Используем чистую функцию DeepSeek
+        ai_response, success = send_to_ai(message, user_id)
 
-    return render_template('chat_message.html',
-                           message=ai_response,
-                           is_user=False)
+        if not success:
+            # Если ошибка в самой функции send_to_ai
+            return render_template('chat_message.html',
+                                   message=ai_response,  # Здесь уже сообщение об ошибке
+                                   is_user=False)
+
+        return render_template('chat_message.html',
+                               message=ai_response,
+                               is_user=False)
+
+    except Exception as e:
+        # Перехватываем исключения, которые могли не быть обработаны
+        error_msg = f"😔 Критическая ошибка: {str(e)}"
+        return render_template('chat_message.html',
+                               message=error_msg,
+                               is_user=False)
 
 
 @app.route('/chat/clear', methods=['POST'])

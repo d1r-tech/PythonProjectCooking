@@ -1,7 +1,7 @@
 import requests
 import json
 from flask import current_app, session
-from functools import wraps
+import time
 
 user_chats = {}
 
@@ -34,136 +34,165 @@ def get_chat_history(user_id):
 
 def save_chat_history(user_id, history):
     """Сохранить историю чата"""
-    if len(history) > 20:
-        history = history[-20:]
+    if len(history) > 30:  # Ограничиваем историю 30 сообщениями
+        # Сохраняем первое системное сообщение и последние 29
+        if history[0]["role"] == "assistant":
+            history = [history[0]] + history[-29:]
+        else:
+            history = history[-30:]
 
     user_chats[user_id] = history
 
 
-def send_to_openrouter(message, user_id):
-    """Отправить сообщение в OpenRouter API - С ПОДРОБНОЙ ОТЛАДКОЙ"""
-    print(f"🔄 Отправка в OpenRouter: '{message}'")
+def send_to_deepseek(message, user_id):
+    """Отправить сообщение в DeepSeek API - чистая реализация"""
+    print(f"🔄 Отправка в DeepSeek: '{message}'")
 
+    # Получаем историю
     history = get_chat_history(user_id)
 
-    # Проверка что history это список
-    if not isinstance(history, list):
-        print(f"⚠️ История не список! Исправляем...")
-        history = [{"role": "assistant", "content": "История сброшена."}]
-
-    # Добавляем сообщение пользователя
+    # Добавляем сообщение пользователя в историю
     history.append({"role": "user", "content": message})
 
     try:
-        api_key = current_app.config.get('OPENROUTER_API_KEY')
-        print(f"API ключ (первые 10 символов): {api_key[:10] if api_key else 'НЕТ'}...")
+        # Получаем конфигурацию из приложения
+        api_key = current_app.config.get('DEEPSEEK_API_KEY')
+        api_url = current_app.config.get('DEEPSEEK_API_URL', 'https://api.deepseek.com/chat/completions')
+        model = current_app.config.get('DEEPSEEK_MODEL', 'deepseek-chat')
 
+        if not api_key:
+            raise ValueError("DEEPSEEK_API_KEY не настроен")
+
+        print(f"Использую модель: {model}")
+
+        # Подготовка заголовков
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
 
+        # Системный промпт для кулинарного помощника
+        system_prompt = """Ты - AI-ассистент кулинарного приложения FoodHub.
+Твоя специализация:
+1. Рецепты и приготовление блюд
+2. Замена ингредиентов 
+3. Советы по кулинарной технике
+4. Хранение продуктов
+5. Ответы на вопросы о питании
+
+Правила:
+- Отвечай кратко и по делу
+- Будь дружелюбным и полезным
+- Если вопрос не по теме, вежливо откажись
+- Форматируй ответы для удобного чтения
+- Используй эмодзи для лучшей наглядности
+
+Контекст приложения:
+- У пользователей есть фильтры по аллергенам
+- Есть категории: Завтраки, Основные блюда, Десерты, Супы, Напитки
+- Пользователи могут добавлять рецепты в избранное"""
+
+        # Формируем сообщения для API
+        messages_for_api = [
+            {"role": "system", "content": system_prompt}
+        ]
+
+        # Добавляем историю (последние 15 сообщений для экономии токенов)
+        for msg in history[-15:]:
+            messages_for_api.append(msg)
+
+        # Подготовка тела запроса
         payload = {
-            "model": "meta-llama/llama-3.2-3b-instruct:free",
-            "messages": [
-                {"role": "system", "content": "Ты кулинарный помощник. Отвечай кратко по-русски."},
-                {"role": "user", "content": message}
-            ],
-            "max_tokens": 300
+            "model": model,
+            "messages": messages_for_api,
+            "max_tokens": 1000,
+            "temperature": 0.7,
+            "top_p": 0.9,
+            "stream": False,
+            "frequency_penalty": 0.1,
+            "presence_penalty": 0.1
         }
 
-        print(f"Отправляю запрос к OpenRouter...")
+        print(f"Отправляю запрос к DeepSeek API...")
 
+        # Отправка запроса с таймаутом
+        start_time = time.time()
         response = requests.post(
-            "https://openrouter.ai/api/v1",
+            api_url,
             headers=headers,
             json=payload,
-            timeout=15
+            timeout=45  # Увеличиваем таймаут
         )
+        response_time = time.time() - start_time
+        print(f"Время ответа: {response_time:.2f} сек")
 
-        print(f"Статус: {response.status_code}")
-        print(f"Тип контента: {response.headers.get('Content-Type')}")
-        print(f"Первые 200 символов ответа: {response.text[:200]}")
-
-        # ПРОВЕРКА ЧТО ВЕРНУЛОСЬ
+        # Проверка статуса
         if response.status_code == 200:
-            try:
-                data = response.json()
-                print(f"JSON успешно распарсен. Ключи: {data.keys()}")
+            data = response.json()
 
-                if 'choices' in data and len(data['choices']) > 0:
-                    ai_response = data['choices'][0]['message']['content']
-                    print(f"AI ответ: {ai_response[:100]}...")
+            if 'choices' in data and len(data['choices']) > 0:
+                ai_response = data['choices'][0]['message']['content']
 
-                    # Добавляем ответ
-                    history.append({"role": "assistant", "content": ai_response})
-                    save_chat_history(user_id, history)
+                # Логирование успеха
+                print(f"✅ Успешный ответ от DeepSeek")
+                print(f"Использовано токенов: {data.get('usage', {}).get('total_tokens', 'неизвестно')}")
 
-                    return ai_response, True
-                else:
-                    print(f"❌ Нет choices в ответе. Весь ответ: {data}")
-                    raise ValueError("Нет choices в ответе API")
+                # Добавляем ответ ассистента в историю
+                history.append({"role": "assistant", "content": ai_response})
+                save_chat_history(user_id, history)
 
-            except json.JSONDecodeError as e:
-                print(f"❌ Ошибка парсинга JSON. Ответ был: {response.text[:500]}")
-                raise
+                return ai_response, True
+            else:
+                print(f"❌ Некорректный ответ от API: {data}")
+                raise ValueError("Нет choices в ответе API")
+
+        elif response.status_code == 401:
+            print(f"❌ Ошибка аутентификации: неверный API ключ")
+            raise PermissionError("Неверный API ключ DeepSeek")
+
+        elif response.status_code == 429:
+            print(f"❌ Слишком много запросов")
+            raise Exception("Превышен лимит запросов. Попробуйте позже.")
+
+        elif response.status_code == 500:
+            print(f"❌ Ошибка сервера DeepSeek")
+            raise Exception("Временная ошибка сервера DeepSeek")
 
         else:
-            print(f"❌ Ошибка HTTP {response.status_code}")
-            print(f"Полный ответ: {response.text}")
-            raise Exception(f"HTTP ошибка {response.status_code}")
+            print(f"❌ Ошибка HTTP {response.status_code}: {response.text}")
+            raise Exception(f"Ошибка API: {response.status_code}")
+
+    except requests.exceptions.Timeout:
+        print(f"🚫 Таймаут запроса к DeepSeek (более 45 секунд)")
+        raise Exception("Время ожидания истекло. Попробуйте еще раз.")
+
+    except requests.exceptions.ConnectionError:
+        print(f"🚫 Ошибка подключения к DeepSeek")
+        raise Exception("Ошибка подключения к серверу.")
 
     except Exception as e:
-        print(f"🚫 Исключение: {type(e).__name__}: {str(e)}")
+        print(f"🚫 Неожиданная ошибка: {type(e).__name__}: {str(e)}")
+        raise
 
-        # ЛОКАЛЬНЫЙ ОТВЕТ ПРИ ЛЮБОЙ ОШИБКЕ
-        local_response = get_local_response(message)
-        print(f"Использую локальный ответ: {local_response[:50]}...")
-
-        # СОХРАНЯЕМ В ИСТОРИЮ
-        if isinstance(history, list):
-            history.append({"role": "assistant", "content": local_response})
-            save_chat_history(user_id, history)
-
-        return local_response, False
 
 def send_to_ai(message, user_id):
-    """Отправка сообщения в AI (автоматически выбирает провайдера)"""
-    # Сначала пробуем OpenRouter
-    response, success = send_to_openrouter(message, user_id)
+    """Отправка сообщения в AI - только DeepSeek"""
+    try:
+        response, success = send_to_deepseek(message, user_id)
+        if success:
+            return response, True
+        else:
+            raise Exception("DeepSeek вернул неуспешный статус")
+    except Exception as e:
+        # Возвращаем понятное сообщение об ошибке
+        error_message = f"😔 Извините, произошла ошибка при обращении к AI: {str(e)}"
 
-    if not success:
-        # Если OpenRouter не сработал, пробуем локальные ответы
-        response = get_local_response(message)
-        save_chat_history(user_id, message)
+        # Добавляем сообщение об ошибке в историю
+        history = get_chat_history(user_id)
+        history.append({"role": "assistant", "content": error_message})
+        save_chat_history(user_id, history)
 
-    return response, success
-
-
-
-def get_local_response(message):
-    """Локальные ответы если API не работает"""
-    message_lower = message.lower()
-
-    responses = {
-        "привет": "Привет! Я кулинарный помощник. Задайте вопрос о рецептах.",
-        "рецепт": "Выберите категорию: Завтраки, Основные блюда, Десерты, Супы, Напитки.",
-        "как приготовить": "Опишите блюдо, и я подскажу или найду похожий рецепт!",
-        "аллерг": "В фильтрах можно исключить аллергены: орехи, молоко, глютен и др.",
-        "вегетариан": "У нас есть вегетарианские рецепты! Выберите категорию.",
-        "быстро": "Для быстрых рецептов посмотрите Завтраки или Основные блюда.",
-        "десерт": "В категории Десерты найдете торты, пироги, печенье.",
-        "суп": "В категории Супы есть различные первые блюда.",
-        "напиток": "В категории Напитки найдете коктейли, чаи, кофейные рецепты.",
-        "избранн": "Добавляйте рецепты в избранное сердечком ★",
-        "спасибо": "Пожалуйста! Обращайтесь ещё 😊",
-    }
-
-    for key, answer in responses.items():
-        if key in message_lower:
-            return answer
-
-    return f"""Я кулинарный помощник. Вы спросили: "{message}"\n\nПопробуйте:\n• Выбрать категорию рецептов\n• Использовать фильтры\n• Посмотреть избранное"""
+        return error_message, False
 
 
 def clear_chat_history(user_id):

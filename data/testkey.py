@@ -1,49 +1,57 @@
-# test_openrouter.py
 import requests
-import os
 
-# 1. Проверьте что ключ в переменных окружения
-api_key = os.getenv('OPENROUTER_API_KEY')
-if not api_key:
-    print("❌ OPENROUTER_API_KEY не установлен в переменных окружения")
-    print("Установите: export OPENROUTER_API_KEY='ваш_ключ'")
-    exit(1)
+API_KEY = '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'
 
-print(f"Ключ найден (длина: {len(api_key)})")
-
-# 2. Простой тестовый запрос
 headers = {
-    "Authorization": f"Bearer {api_key}",
+    "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json",
     "HTTP-Referer": "http://localhost:5000",
     "X-Title": "FoodHub Test"
 }
 
-payload = {
-    "model": "meta-llama/llama-3.2-3b-instruct:free",
-    "messages": [
-        {"role": "user", "content": "Привет, как дела?"}
-    ],
-    "max_tokens": 50
-}
+# АКТУАЛЬНЫЕ РАБОЧИЕ МОДЕЛИ (январь 2025):
+MODELS_TO_TRY = [
+    "google/gemma-2-2b-it:free",  # ← ГЕММА 2 (новое название)
+    "microsoft/phi-3.5-mini-instruct:free",  # ← PHI 3.5 (новое)
+    "qwen/qwen2.5-coder-7b-instruct:free",  # ← QWEN 2.5
+    "meta-llama/llama-3.2-3b-instruct",  # ← БЕЗ :free
+    "mistralai/mistral-7b-instruct-v0.3:free",
+    "nousresearch/hermes-3-llama-3.1-8b:free"
+]
 
-try:
-    response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers=headers,
-        json=payload,
-        timeout=10
-    )
+for model in MODELS_TO_TRY:
+    print(f"\n🔧 Тестируем: {model}")
 
-    print(f"Статус: {response.status_code}")
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "user", "content": "Привет, ответь 'работает' если слышишь"}
+        ],
+        "max_tokens": 30
+    }
 
-    if response.status_code == 200:
-        data = response.json()
-        print("✅ API работает!")
-        print(f"Ответ: {data['choices'][0]['message']['content']}")
-    else:
-        print(f"❌ Ошибка: {response.status_code}")
-        print(f"Ответ: {response.text[:500]}")
+    try:
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=10
+        )
 
-except Exception as e:
-    print(f"❌ Ошибка соединения: {e}")
+        print(f"   Статус: {response.status_code}")
+
+        if response.status_code == 200:
+            data = response.json()
+            answer = data['choices'][0]['message']['content']
+            print(f"   ✅ РАБОТАЕТ! Ответ: {answer}")
+            print(f"\n🎉 ИСПОЛЬЗУЙТЕ: {model}")
+            break
+        elif response.status_code == 429:
+            print(f"   ⚠️  Лимит (429). Попробуем следующую...")
+        elif response.status_code == 404:
+            print(f"   ❌ Модель не найдена (404)")
+        else:
+            print(f"   ❌ Ошибка {response.status_code}: {response.text[:100]}")
+
+    except Exception as e:
+        print(f"   ❌ Исключение: {e}")
