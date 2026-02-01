@@ -1,7 +1,101 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <!-- ============ БЛОК ИНФОРМАЦИИ О ПОИСКЕ ============ -->
+    {% if search_query %}
+    <div class="alert alert-info mb-4" style="
+        background: rgba(212, 165, 116, 0.1);
+        border: 1px solid rgba(212, 165, 116, 0.3);
+        border-radius: 12px;
+        color: #333;
+    ">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-2" style="color: #D4A574;">
+                    <i class="fas fa-search mr-2"></i>Результаты поиска
+                </h5>
+                <p class="mb-1">
+                    По запросу <strong>"{{ search_query }}"</strong>
+                    найдено <strong class="text-primary">{{ recipes|length }}</strong> рецептов
+                </p>
+                {% if no_allergens_filter and current_user.is_authenticated %}
+                <small class="text-muted">
+                    <i class="fas fa-filter mr-1"></i>
+                    Фильтр: "Без моих аллергенов" активен
+                </small>
+                {% endif %}
+            </div>
+            <div>
+                <a href="{{ url_for('index') }}" class="btn btn-sm" style="
+                    background: #D4A574;
+                    color: white;
+                    border-radius: 20px;
+                    border: 1px solid rgba(212, 165, 116, 0.3);
+                    padding: 6px 15px;
+                ">
+                    <i class="fas fa-times mr-1"></i> Сбросить поиск
+                </a>
+            </div>
+        </div>
 
+        <!-- Расширенный поиск (скрытый по умолчанию) -->
+        <div class="mt-3">
+            <button class="btn btn-link btn-sm p-0" type="button"
+                    data-toggle="collapse" data-target="#advancedSearch"
+                    aria-expanded="false" aria-controls="advancedSearch"
+                    style="color: #D4A574; text-decoration: none;">
+                <i class="fas fa-sliders-h mr-1"></i> Расширенный поиск
+            </button>
+
+            <div class="collapse mt-2" id="advancedSearch">
+                <form method="GET" action="{{ url_for('search') }}" class="border-top pt-3">
+                    <input type="hidden" name="q" value="{{ search_query }}">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="searchCategory" class="small text-muted mb-1">
+                                    <i class="fas fa-filter"></i> Категория:
+                                </label>
+                                <select name="category" id="searchCategory" class="form-control form-control-sm">
+                                    <option value="">Все категории</option>
+                                    {% for cat in categories %}
+                                    <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>
+                                        {{ cat }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        {% if current_user.is_authenticated %}
+                        <div class="col-md-6">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" name="no_allergens"
+                                       id="noAllergens" value="true"
+                                       {% if no_allergens_filter %}checked{% endif %}>
+                                <label class="form-check-label small" for="noAllergens">
+                                    <i class="fas fa-allergies"></i> Без моих аллергенов
+                                </label>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-sm" style="
+                        background: #D4A574;
+                        color: white;
+                        border-radius: 20px;
+                        padding: 5px 20px;
+                    ">
+                        <i class="fas fa-search mr-1"></i> Применить фильтры
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <!-- ============ КОНЕЦ БЛОКА ПОИСКА ============ -->
 {% if selected_category %}
 <div style="
     margin-bottom: 25px;

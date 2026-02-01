@@ -1,0 +1,28 @@
+<!-- templates/includes/search_bar.html -->
+<form method="GET" action="{{ url_for('search') }}" class="search-form ml-3">
+    <div class="input-group">
+        <input type="text"
+               name="q"
+               class="form-control form-control-sm"
+               placeholder="Поиск рецептов..."
+               value="{{ query if query else '' }}"
+               aria-label="Поиск рецептов"
+               style="
+                   border-radius: 20px 0 0 20px;
+                   border: 1px solid rgba(212, 165, 116, 0.3);
+                   padding: 8px 15px;
+                   min-width: 250px;
+               ">
+        <div class="input-group-append">
+            <button class="btn btn-sm" type="submit" style="
+                background: #D4A574;
+                color: white;
+                border-radius: 0 20px 20px 0;
+                border: 1px solid rgba(212, 165, 116, 0.3);
+                padding: 8px 15px;
+            ">
+                🔍
+            </button>
+        </div>
+    </div>
+</form>

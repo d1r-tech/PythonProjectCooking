@@ -11,6 +11,8 @@ from forms.user import RegisterForm, LoginForm
 from data.default_recipes import create_default_recipes
 import os
 from flask_htmx import HTMX
+from sqlalchemy import or_, and_
+import re
 import requests
 import json
 from data.chat import get_user_id, get_chat_history, send_to_ai, clear_chat_history
@@ -62,6 +64,85 @@ def index():
         recipes = db_sess.query(Recipes).filter(Recipes.category == selected_category).all()
     return render_template(template_name, recipes=recipes, categories=categories, selected_category=selected_category, all_allergens=all_allergens, THEME=THEME)
 
+
+@app.route("/search")
+def search():
+    THEME = os.environ.get('APP_THEME', 'food')
+
+    if THEME == 'cosmic':
+        template_name = 'index_cosmic.html'
+    else:
+        template_name = 'index.html'
+
+    db_sess = db_session.create_session()
+
+    # Получаем параметры поиска
+    query = request.args.get('q', '').strip()
+    category = request.args.get('category', '')
+    no_allergens = request.args.get('no_allergens') == 'true'
+
+    print(f"=== ПОИСК ===")
+    print(f"Запрос: '{query}'")
+    print(f"Категория: '{category}'")
+    print(f"Без аллергенов: {no_allergens}")
+
+    # Базовый запрос - все рецепты
+    recipes_query = db_sess.query(Recipes)
+
+    # 1. Поиск по тексту (название, описание, ингредиенты)
+    if query:
+        print(f"Ищем: '{query}'")
+
+        # ВАЖНО: исправляем поиск - ищем по частичному совпадению
+        search_pattern = f"%{query}%"
+
+        conditions = [
+            Recipes.title.ilike(search_pattern),
+            Recipes.content.ilike(search_pattern),
+            Recipes.ingredients.ilike(search_pattern)
+        ]
+
+        print(f"Условия поиска: {conditions}")
+
+        # Применяем условия через OR (ИЛИ)
+        recipes_query = recipes_query.filter(or_(*conditions))
+
+        # Считаем сколько нашлось ДО фильтрации
+        count_before = recipes_query.count()
+        print(f"Найдено рецептов ДО фильтрации: {count_before}")
+
+    # 2. Фильтр по категории
+    if category:
+        print(f"Фильтруем по категории: '{category}'")
+        recipes_query = recipes_query.filter(Recipes.category == category)
+
+    # 3. Получаем все рецепты для отладки
+    all_recipes = recipes_query.all()
+    print(f"Всего рецептов после фильтров: {len(all_recipes)}")
+
+    # Выводим названия найденных рецептов для отладки
+    for i, recipe in enumerate(all_recipes, 1):
+        print(f"{i}. {recipe.title} (категория: {recipe.category})")
+
+    # Получаем все категории для выпадающего списка
+    categories = db_sess.query(Recipes.category).distinct().all()
+    categories = [cat[0] for cat in categories if cat[0]]
+
+    # Получаем все аллергены
+    all_allergens = db_sess.query(Allergen).all()
+
+    db_sess.close()
+
+    # Отображаем шаблон с результатами
+    return render_template(template_name,
+                           recipes=all_recipes,
+                           categories=categories,
+                           selected_category=category,
+                           all_allergens=all_allergens,
+                           THEME=THEME,
+                           search_query=query,
+                           no_allergens_filter=no_allergens,
+                           title=f'Результаты поиска: {query}' if query else 'Поиск рецептов')
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -245,4 +326,4 @@ def download_recipe(recipe_id):
 #     return render_template('ai_chat.html')
 
 if __name__ == '__main__':
-    app.run(port=8091, host='127.0.0.1')
+    app.run(port=8080, host='127.0.0.1')
