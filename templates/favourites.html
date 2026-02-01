@@ -21,9 +21,18 @@
                             <span class="text-success">нет</span>
                         {% endif %}
                     </p>
-                    <a href="/remove_from_favourites/{{ recipe.id }}" class="btn btn-outline-danger btn-sm">
-                        ❌ Удалить из избранного
-                    </a>
+
+                    <div class="recipe-actions">
+                        <a href="/download_recipe/{{ recipe.id }}"
+                           class="recipe-action-btn btn-download">
+                                Скачать рецепт
+                        </a>
+
+                        <a href="/remove_from_favourites/{{ recipe.id }}"
+                           class="recipe-action-btn btn-remove-fav">
+                            Удалить из избранного
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endfor %}

@@ -19,6 +19,13 @@ from data.chat import get_user_id, get_chat_history, send_to_ai, clear_chat_hist
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = '65432456uijhgfdsxcvbntghigfeloghlfgogug36364545464737re5dikkfuytotglbligjuftugitlgolgugtu'
+@app.before_request
+def force_guest_on_restart():
+    from flask import session
+    if 'initialized' not in session:
+        session.clear()
+        logout_user()
+        session['initialized'] = True
 login_manager = LoginManager()
 login_manager.init_app(app)
 htmx = HTMX(app)
@@ -123,7 +130,6 @@ def add_to_favourites(recipe_id):
         db_sess.close()
     return redirect(request.referrer or '/')
 
-
 @app.route('/remove_from_favourites/<int:recipe_id>')
 @login_required
 def remove_from_favourites(recipe_id):
@@ -140,67 +146,103 @@ def remove_from_favourites(recipe_id):
         db_sess.close()
     return redirect(request.referrer or '/')
 
+@app.route('/download_recipe/<int:recipe_id>')
+def download_recipe(recipe_id):
+    db_sess = db_session.create_session()
+    recipe = db_sess.query(Recipes).get(recipe_id)
 
-@app.route('/chat/send', methods=['POST'])
-def send_message():
-    """Отправить сообщение в AI"""
-    message = request.form.get('message', '').strip()
+    if not recipe:
+        return "Рецепт не найден", 404
 
-    if not message:
-        return render_template('chat_message.html',
-                               message="Сообщение не может быть пустым",
-                               is_user=False)
+    text = f"""
+{recipe.title}
+{'=' * 40}
 
-    user_id = get_user_id()
+Категория: {recipe.category}
 
-    try:
-        # Используем чистую функцию DeepSeek
-        ai_response, success = send_to_ai(message, user_id)
+Ингредиенты:
+{recipe.ingredients}
 
-        if not success:
-            # Если ошибка в самой функции send_to_ai
-            return render_template('chat_message.html',
-                                   message=ai_response,  # Здесь уже сообщение об ошибке
-                                   is_user=False)
+Приготовление:
+{recipe.content}
 
-        return render_template('chat_message.html',
-                               message=ai_response,
-                               is_user=False)
+Аллергены: {', '.join([a.title for a in recipe.allergens])}
+"""
 
-    except Exception as e:
-        # Перехватываем исключения, которые могли не быть обработаны
-        error_msg = f"😔 Критическая ошибка: {str(e)}"
-        return render_template('chat_message.html',
-                               message=error_msg,
-                               is_user=False)
+    from io import BytesIO
+    file = BytesIO(text.encode('utf-8'))
 
+    db_sess.close()
 
-@app.route('/chat/clear', methods=['POST'])
-def clear_chat():
-    """Очистить историю чата"""
-    user_id = get_user_id()
-    clear_chat_history(user_id)
+    from flask import send_file
+    return send_file(
+        file,
+        as_attachment=True,
+        download_name=f'{recipe.title}.txt',
+        mimetype='text/plain'
+    )
 
-    return render_template('chat_message.html',
-                           message="История очищена. Чем могу помочь?",
-                           is_user=False)
-
-
-@app.route('/chat/history', methods=['GET'])
-def get_chat_history_route():
-    """Получить всю историю чата"""
-    user_id = get_user_id()
-    history = get_chat_history(user_id)
-
-    # Пропускаем первое приветственное сообщение
-    messages = history[1:] if len(history) > 1 else []
-
-    return render_template('chat_history.html', messages=messages)
-
-@app.route('/ai_chat')
-def ai_chat():
-    """Страница AI чата"""
-    return render_template('ai_chat.html')
+#
+# @app.route('/chat/send', methods=['POST'])
+# def send_message():
+#     """Отправить сообщение в AI"""
+#     message = request.form.get('message', '').strip()
+#
+#     if not message:
+#         return render_template('chat_message.html',
+#                                message="Сообщение не может быть пустым",
+#                                is_user=False)
+#
+#     user_id = get_user_id()
+#
+#     try:
+#         # Используем чистую функцию DeepSeek
+#         ai_response, success = send_to_ai(message, user_id)
+#
+#         if not success:
+#             # Если ошибка в самой функции send_to_ai
+#             return render_template('chat_message.html',
+#                                    message=ai_response,  # Здесь уже сообщение об ошибке
+#                                    is_user=False)
+#
+#         return render_template('chat_message.html',
+#                                message=ai_response,
+#                                is_user=False)
+#
+#     except Exception as e:
+#         # Перехватываем исключения, которые могли не быть обработаны
+#         error_msg = f"😔 Критическая ошибка: {str(e)}"
+#         return render_template('chat_message.html',
+#                                message=error_msg,
+#                                is_user=False)
+#
+#
+# @app.route('/chat/clear', methods=['POST'])
+# def clear_chat():
+#     """Очистить историю чата"""
+#     user_id = get_user_id()
+#     clear_chat_history(user_id)
+#
+#     return render_template('chat_message.html',
+#                            message="История очищена. Чем могу помочь?",
+#                            is_user=False)
+#
+#
+# @app.route('/chat/history', methods=['GET'])
+# def get_chat_history_route():
+#     """Получить всю историю чата"""
+#     user_id = get_user_id()
+#     history = get_chat_history(user_id)
+#
+#     # Пропускаем первое приветственное сообщение
+#     messages = history[1:] if len(history) > 1 else []
+#
+#     return render_template('chat_history.html', messages=messages)
+#
+# @app.route('/ai_chat')
+# def ai_chat():
+#     """Страница AI чата"""
+#     return render_template('ai_chat.html')
 
 if __name__ == '__main__':
     app.run(port=8091, host='127.0.0.1')

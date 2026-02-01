@@ -65,10 +65,115 @@
 .category-buttons .category-card:hover::before {
     background: rgba(10, 14, 42, 0.7) !important;
 }
+    .download-btn {
+    display: inline-block;
+    background: #4CAF50;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin: 5px;
+}
+
+.download-btn:hover {
+    background: #45a049;
+}
 </style>
     <style>
     .flash-message {
         transition: opacity 0.8s ease-in-out;
+    }
+    .recipe-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(212, 165, 116, 0.2);
+    }
+
+    .recipe-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 180px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .recipe-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+    }
+
+    .recipe-action-btn:active {
+        transform: translateY(0);
+    }
+
+
+    .btn-download {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border: 1px solid #1e7e34;
+    }
+
+    .btn-add-fav {
+        background: linear-gradient(135deg, #fd7e14, #ff922b);
+        color: white;
+        border: 1px solid #e8590c;
+    }
+
+    .btn-remove-fav {
+        background: linear-gradient(135deg, #dc3545, #ff6b6b);
+        color: white;
+        border: 1px solid #c92a2a;
+    }
+
+
+    .btn-disabled {
+        background: linear-gradient(135deg, #6c757d, #868e96);
+        color: white;
+        border: 1px solid #495057;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .btn-disabled:hover {
+        transform: none !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+
+
+    .recipe-action-btn::before {
+        font-size: 16px;
+    }
+
+
+    .download-btn {
+        display: none !important;
+    }
+
+
+    @media (max-width: 768px) {
+        .recipe-action-btn {
+            min-width: 140px;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .recipe-actions {
+            flex-direction: column;
+            gap: 8px;
+        }
     }
     </style>
     <style>
@@ -154,7 +259,7 @@
                 text-decoration: none;
                 cursor: default;
             ">
-                🍽️ FOODHUB
+                 FOODHUB
             </span>
 
             <div class="d-flex align-items-center">
@@ -318,9 +423,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 </script>
-
-<a href="/ai_chat" style="position: fixed; bottom: 20px; right: 20px; background: #f56565; color: white; padding: 15px 25px; border-radius: 50px; text-decoration: none;">
-    🤖 AI Чат
-</a>
 </body>
 </html>
