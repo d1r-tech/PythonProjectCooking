@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, abort, flash
+from flask import Flask, render_template, redirect, request, abort, flash, jsonify
 from data import db_session
 from data.allergens import Allergen
 from data.default_allergens import create_default_allergens
@@ -11,7 +11,7 @@ from forms.user import RegisterForm, LoginForm
 from data.default_recipes import create_default_recipes
 import os
 from flask_htmx import HTMX
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, func, and_
 import re
 import requests
 import json
@@ -67,12 +67,9 @@ def index():
 
 @app.route("/search")
 def search():
-    THEME = os.environ.get('APP_THEME', 'food')
-
-    if THEME == 'cosmic':
-        template_name = 'index_cosmic.html'
-    else:
-        template_name = 'index.html'
+    """Простой поиск рецептов"""
+    # Всегда используем отдельный шаблон для поиска
+    template_name = 'searchres.html'
 
     db_sess = db_session.create_session()
 
@@ -81,75 +78,71 @@ def search():
     category = request.args.get('category', '')
     no_allergens = request.args.get('no_allergens') == 'true'
 
-    print(f"=== ПОИСК ===")
-    print(f"Запрос: '{query}'")
-    print(f"Категория: '{category}'")
-    print(f"Без аллергенов: {no_allergens}")
-
-    # Базовый запрос - все рецепты
+    # Базовый запрос
     recipes_query = db_sess.query(Recipes)
 
-    # 1. Поиск по тексту (название, описание, ингредиенты)
+    # 1. Поиск по тексту
     if query:
-        print(f"Ищем: '{query}'")
+        query_clean = query.strip()
+        words = query_clean.split()
 
-        # ВАЖНО: исправляем поиск - ищем по частичному совпадению
-        search_pattern = f"%{query}%"
+        # Если одно слово
+        if len(words) == 1:
+            pattern = f"%{query_clean}%"
+            recipes_query = recipes_query.filter(
+                or_(
+                    Recipes.title.ilike(pattern),
+                    Recipes.ingredients.ilike(pattern)
+                )
+            )
 
-        conditions = [
-            Recipes.title.ilike(search_pattern),
-            Recipes.content.ilike(search_pattern),
-            Recipes.ingredients.ilike(search_pattern)
-        ]
-
-        print(f"Условия поиска: {conditions}")
-
-        # Применяем условия через OR (ИЛИ)
-        recipes_query = recipes_query.filter(or_(*conditions))
-
-        # Считаем сколько нашлось ДО фильтрации
-        count_before = recipes_query.count()
-        print(f"Найдено рецептов ДО фильтрации: {count_before}")
+        # Если несколько слов
+        else:
+            # Ищем полную фразу
+            full_pattern = f"%{query_clean}%"
+            recipes_query = recipes_query.filter(
+                or_(
+                    Recipes.title.ilike(full_pattern),
+                    Recipes.ingredients.ilike(full_pattern)
+                )
+            )
 
     # 2. Фильтр по категории
     if category:
-        print(f"Фильтруем по категории: '{category}'")
         recipes_query = recipes_query.filter(Recipes.category == category)
 
-    # 3. Получаем все рецепты для отладки
+    # 3. Фильтр без аллергенов
+    if no_allergens:
+        recipes_query = recipes_query.filter(~Recipes.allergens.any())
+
+    # Получаем результаты
     all_recipes = recipes_query.all()
-    print(f"Всего рецептов после фильтров: {len(all_recipes)}")
 
-    # Выводим названия найденных рецептов для отладки
-    for i, recipe in enumerate(all_recipes, 1):
-        print(f"{i}. {recipe.title} (категория: {recipe.category})")
-
-    # Получаем все категории для выпадающего списка
+    # Получаем все категории для отображения
     categories = db_sess.query(Recipes.category).distinct().all()
     categories = [cat[0] for cat in categories if cat[0]]
 
     # Получаем все аллергены
     all_allergens = db_sess.query(Allergen).all()
 
+    # Закрываем сессию
     db_sess.close()
 
-    # Отображаем шаблон с результатами
+    # Отображаем отдельный шаблон для поиска
     return render_template(template_name,
                            recipes=all_recipes,
                            categories=categories,
                            selected_category=category,
                            all_allergens=all_allergens,
-                           THEME=THEME,
                            search_query=query,
-                           no_allergens_filter=no_allergens,
-                           title=f'Результаты поиска: {query}' if query else 'Поиск рецептов')
-
-@app.route('/register', methods=['GET', 'POST'])
+                           no_allergens_filter=no_allergens)
+@app.route('/reqister', methods=['GET', 'POST'])
 def reqister():
+    """Регистрация (с опечаткой)"""
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-           return render_template('register.html', title='Регистрация',
+            return render_template('register.html', title='Регистрация',
                                     form=form,
                                     message="Пароли не совпадают")
         db_sess = db_session.create_session()
@@ -164,9 +157,9 @@ def reqister():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
+        db_sess.close()
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()

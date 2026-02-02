@@ -291,7 +291,7 @@ a[href="/"]:hover {
     <div id="recipesList">
         {% if recipes %}
             {% for recipe in recipes %}
-            <div class="recipe-card card mb-3" data-allergens="{{ recipe.allergens|map(attribute='id')|join(',') }}">
+            <div class="recipe-card card mb-3" data-allergens="{{ recipe.allergens|map(attribute='id')|join(',') }}" id="recipe-{{ recipe.id }}">
                 <div class="card-body">
                     <h4 class="card-title">{{ recipe.title }}</h4>
                     <p class="card-text"><strong>Ингредиенты:</strong> {{ recipe.ingredients }}</p>
@@ -433,4 +433,37 @@ function showRegistrationAlert() {
     }
 }
 </style>
+<script>
+// Скролл к рецепту при загрузке страницы с якорем
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+
+    if (hash && hash.startsWith('#recipe-')) {
+        const recipeId = hash.replace('#recipe-', '');
+        const recipeElement = document.getElementById(`recipe-${recipeId}`);
+
+        if (recipeElement) {
+            // Ждем немного для загрузки контента
+            setTimeout(() => {
+                // Добавляем подсветку
+                recipeElement.style.border = '2px solid #D4A574';
+                recipeElement.style.boxShadow = '0 0 15px rgba(212, 165, 116, 0.3)';
+                recipeElement.style.transition = 'all 0.5s';
+
+                // Скроллим к рецепту
+                recipeElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                // Убираем подсветку через 5 секунд
+                setTimeout(() => {
+                    recipeElement.style.border = '';
+                    recipeElement.style.boxShadow = '';
+                }, 5000);
+            }, 300);
+        }
+    }
+});
+</script>
 {% endblock %}

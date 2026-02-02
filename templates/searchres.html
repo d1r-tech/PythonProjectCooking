@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">
+        🔍 Результаты поиска: "<span class="text-primary">{{ search_query }}</span>"
+    </h2>
+
+    <!-- Уведомление для незарегистрированных -->
+    {% if not current_user.is_authenticated %}
+    <div class="alert alert-info mb-4" style="
+        background: rgba(212, 165, 116, 0.1);
+        border: 1px solid rgba(212, 165, 116, 0.3);
+        border-radius: 10px;
+        color: #333;
+    ">
+        <div class="d-flex align-items-center">
+            <div style="font-size: 20px; margin-right: 10px;">📝</div>
+            <div>
+                <strong>Войдите или зарегистрируйтесь,</strong> чтобы добавлять рецепты в избранное!
+            </div>
+            <div class="ml-auto">
+                <a href="{{ url_for('login') }}" class="btn btn-sm mr-2" style="
+                    background: #D4A574;
+                    color: white;
+                    border: 1px solid rgba(212, 165, 116, 0.3);
+                    border-radius: 8px;
+                    padding: 5px 12px;
+                ">
+                    Войти
+                </a>
+                <a href="{{ url_for('reqister') }}" class="btn btn-sm" style="
+                    background: #28a745;
+                    color: white;
+                    border: 1px solid rgba(40, 167, 69, 0.3);
+                    border-radius: 8px;
+                    padding: 5px 12px;
+                ">
+                    Регистрация
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Информация о поиске -->
+    <div class="alert alert-light mb-4" style="
+        background: rgba(212, 165, 116, 0.05);
+        border: 1px solid rgba(212, 165, 116, 0.2);
+        border-radius: 10px;
+    ">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Найдено рецептов:</strong> {{ recipes|length }}
+                {% if selected_category %}
+                    в категории <span class="badge" style="
+                        background: rgba(212, 165, 116, 0.2);
+                        color: #333;
+                    ">{{ selected_category }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <a href="/" class="btn btn-sm" style="
+                    background: #D4A574;
+                    color: white;
+                    border: 1px solid rgba(212, 165, 116, 0.3);
+                    border-radius: 8px;
+                    padding: 5px 15px;
+                ">
+                    ← На главную
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Результаты -->
+    {% if recipes %}
+        <div class="recipes">
+            {% for recipe in recipes %}
+            <div class="recipe-card card mb-3" style="
+                border: 1px solid rgba(212, 165, 116, 0.3);
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.9);
+            ">
+                <div class="card-body">
+                    <h4 class="card-title">{{ recipe.title }}</h4>
+
+                    <p class="card-text">
+                        <small class="text-muted">
+                            📁 <strong>{{ recipe.category }}</strong>
+                            {% if recipe.cooking_time %}
+                                • ⏱️ {{ recipe.cooking_time }} мин
+                            {% endif %}
+                        </small>
+                    </p>
+
+                    <p class="card-text">
+                        <strong>Ингредиенты:</strong><br>
+                        {{ recipe.ingredients }}
+                    </p>
+
+                    <div class="recipe-actions">
+                        <a href="/download_recipe/{{ recipe.id }}"
+                           class="recipe-action-btn btn-download">
+                           💾 Скачать рецепт
+                        </a>
+
+                        {% if current_user.is_authenticated %}
+                            {% set fav_ids = [] %}
+                            {% for fav in current_user.favourite_recipes %}
+                                {% set _ = fav_ids.append(fav.id) %}
+                            {% endfor %}
+
+                            {% if recipe.id in fav_ids %}
+                                <a href="/remove_from_favourites/{{ recipe.id }}"
+                                   class="recipe-action-btn btn-remove-fav">
+                                   ❌ Удалить из избранного
+                                </a>
+                            {% else %}
+                                <a href="/add_to_favourites/{{ recipe.id }}"
+                                   class="recipe-action-btn btn-add-fav">
+                                   ⭐ Добавить в избранное
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <button class="recipe-action-btn btn-disabled"
+                                    onclick="showRegistrationAlert()"
+                                    title="Зарегистрируйтесь, чтобы добавить рецепт в избранное">
+                                ⭐ Добавить в избранное
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning" style="
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+        ">
+            <h5 class="alert-heading">😕 Ничего не найдено</h5>
+            <p>По запросу <strong>"{{ search_query }}"</strong> рецептов не найдено.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
