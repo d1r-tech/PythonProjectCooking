@@ -6,7 +6,6 @@
         🔍 Результаты поиска: "<span class="text-primary">{{ search_query }}</span>"
     </h2>
 
-    <!-- Уведомление для незарегистрированных -->
     {% if not current_user.is_authenticated %}
     <div class="alert alert-info mb-4" style="
         background: rgba(212, 165, 116, 0.1);
@@ -43,7 +42,6 @@
     </div>
     {% endif %}
 
-    <!-- Информация о поиске -->
     <div class="alert alert-light mb-4" style="
         background: rgba(212, 165, 116, 0.05);
         border: 1px solid rgba(212, 165, 116, 0.2);
@@ -73,7 +71,6 @@
         </div>
     </div>
 
-    <!-- Результаты -->
     {% if recipes %}
         <div class="recipes">
             {% for recipe in recipes %}
@@ -94,39 +91,52 @@
                         </small>
                     </p>
 
-                    <p class="card-text">
+                   <p class="card-text">
                         <strong>Ингредиенты:</strong><br>
                         {{ recipe.ingredients }}
                     </p>
+                   <p class="card-text">
+                        <strong>Приготовление:</strong><br>
+                        {{ recipe.content | replace('\n', '<br>') | safe }}
+                   </p>
+
+                   <p class="card-text">
+                        <strong>Аллергены:</strong>
+                        {{ recipe.allergens|map(attribute='title')|join(', ') or 'нет' }}
+                   </p>
 
                     <div class="recipe-actions">
                         <a href="/download_recipe/{{ recipe.id }}"
                            class="recipe-action-btn btn-download">
-                           💾 Скачать рецепт
+                            Скачать рецепт
                         </a>
 
                         {% if current_user.is_authenticated %}
                             {% set fav_ids = [] %}
-                            {% for fav in current_user.favourite_recipes %}
-                                {% set _ = fav_ids.append(fav.id) %}
-                            {% endfor %}
+                            {% if current_user.favourite_recipes %}
+                                {% for fav in current_user.favourite_recipes %}
+                                    {% if fav.id %}
+                                        {% set _ = fav_ids.append(fav.id) %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
 
                             {% if recipe.id in fav_ids %}
                                 <a href="/remove_from_favourites/{{ recipe.id }}"
                                    class="recipe-action-btn btn-remove-fav">
-                                   ❌ Удалить из избранного
+                                    Удалить из избранного
                                 </a>
                             {% else %}
                                 <a href="/add_to_favourites/{{ recipe.id }}"
                                    class="recipe-action-btn btn-add-fav">
-                                   ⭐ Добавить в избранное
+                                    Добавить в избранное
                                 </a>
                             {% endif %}
                         {% else %}
                             <button class="recipe-action-btn btn-disabled"
                                     onclick="showRegistrationAlert()"
                                     title="Зарегистрируйтесь, чтобы добавить рецепт в избранное">
-                                ⭐ Добавить в избранное
+                                 Добавить в избранное
                             </button>
                         {% endif %}
                     </div>
@@ -141,9 +151,60 @@
             border-radius: 10px;
             padding: 25px;
         ">
-            <h5 class="alert-heading">😕 Ничего не найдено</h5>
+            <h5 class="alert-heading"> Ничего не найдено</h5>
             <p>По запросу <strong>"{{ search_query }}"</strong> рецептов не найдено.</p>
         </div>
     {% endif %}
 </div>
+<div id="registrationAlert" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 10000;">
+    <div style="
+        background: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-size: 15px;
+        font-weight: 500;
+        animation: fadeSlide 4s ease-in-out;
+        transition: opacity 0.8s ease;
+    ">
+        📝 <strong>Чтобы добавить рецепт в избранное, зарегистрируйтесь</strong>
+    </div>
+</div>
+
+<script>
+function showRegistrationAlert() {
+    const alert = document.getElementById('registrationAlert');
+    alert.style.display = 'block';
+
+    setTimeout(() => {
+        alert.style.opacity = '0';
+        setTimeout(() => {
+            alert.style.display = 'none';
+            alert.style.opacity = '1';
+        }, 800);
+    }, 3200);
+}
+</script>
+
+<style>
+@keyframes fadeSlide {
+    0% {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    20% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    80% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+}
+</style>
 {% endblock %}

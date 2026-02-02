@@ -7,17 +7,11 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from data.users import User
 from forms.recipes import RecipesForm
 from forms.user import RegisterForm, LoginForm
-#from openai import OpenAI
 from data.default_recipes import create_default_recipes
 import os
 from flask_htmx import HTMX
 from sqlalchemy import or_, func, and_
-import re
-import requests
-import json
-from data.chat import get_user_id, get_chat_history, send_to_ai, clear_chat_history
 
-# client = OpenAI(api_key="sk-2ac11b4f4b4142f8ae0e93bafe291802", base_url="https://api.deepseek.com")
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = '65432456uijhgfdsxcvbntghigfeloghlfgogug36364545464737re5dikkfuytotglbligjuftugitlgolgugtu'
@@ -31,9 +25,7 @@ def force_guest_on_restart():
 login_manager = LoginManager()
 login_manager.init_app(app)
 htmx = HTMX(app)
-app.config['DEEPSEEK_API_KEY'] = 'sk-9a1fadff540847dc9f98c343df501e25'
-app.config['DEEPSEEK_API_URL'] = 'https://api.deepseek.com/chat/completions'
-app.config['DEEPSEEK_MODEL'] = 'deepseek-chat'
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -50,10 +42,8 @@ db_sess.close()
 def index():
     THEME = os.environ.get('APP_THEME', 'food')
 
-    if THEME == 'cosmic':
-        template_name = 'index_cosmic.html'
-    else:
-        template_name = 'index.html'
+    template_name = 'index.html'
+
     db_sess = db_session.create_session()
     categories = db_sess.query(Recipes.category).distinct().all()
     categories = [cat[0] for cat in categories if cat[0]]
@@ -67,78 +57,51 @@ def index():
 
 @app.route("/search")
 def search():
-    """Простой поиск рецептов"""
-    # Всегда используем отдельный шаблон для поиска
-    template_name = 'searchres.html'
-
     db_sess = db_session.create_session()
 
-    # Получаем параметры поиска
-    query = request.args.get('q', '').strip()
-    category = request.args.get('category', '')
-    no_allergens = request.args.get('no_allergens') == 'true'
+    query = request.args.get('q', '').strip().lower()
+    print(f"🔍 Python поиск (AND логика): '{query}'")
 
-    # Базовый запрос
-    recipes_query = db_sess.query(Recipes)
+    all_recipes = db_sess.query(Recipes).all()
 
-    # 1. Поиск по тексту
-    if query:
-        query_clean = query.strip()
-        words = query_clean.split()
+    if not query:
+        recipes = all_recipes
+    else:
+        recipes = []
+        words = [w for w in query.split() if w]
 
-        # Если одно слово
-        if len(words) == 1:
-            pattern = f"%{query_clean}%"
-            recipes_query = recipes_query.filter(
-                or_(
-                    Recipes.title.ilike(pattern),
-                    Recipes.ingredients.ilike(pattern)
-                )
-            )
+        for recipe in all_recipes:
+            title_lower = recipe.title.lower()
 
-        # Если несколько слов
-        else:
-            # Ищем полную фразу
-            full_pattern = f"%{query_clean}%"
-            recipes_query = recipes_query.filter(
-                or_(
-                    Recipes.title.ilike(full_pattern),
-                    Recipes.ingredients.ilike(full_pattern)
-                )
-            )
+            all_words_found = True
 
-    # 2. Фильтр по категории
-    if category:
-        recipes_query = recipes_query.filter(Recipes.category == category)
+            for word in words:
+                if word in title_lower:
+                    continue
+                else:
+                    all_words_found = False
+                    break
 
-    # 3. Фильтр без аллергенов
-    if no_allergens:
-        recipes_query = recipes_query.filter(~Recipes.allergens.any())
+            if all_words_found:
+                recipes.append(recipe)
+    for recipe in recipes:
+        _ = recipe.allergens
 
-    # Получаем результаты
-    all_recipes = recipes_query.all()
-
-    # Получаем все категории для отображения
+    print(f"ИТОГ: Найдено {len(recipes)} рецептов")
     categories = db_sess.query(Recipes.category).distinct().all()
     categories = [cat[0] for cat in categories if cat[0]]
-
-    # Получаем все аллергены
     all_allergens = db_sess.query(Allergen).all()
 
-    # Закрываем сессию
     db_sess.close()
 
-    # Отображаем отдельный шаблон для поиска
-    return render_template(template_name,
-                           recipes=all_recipes,
-                           categories=categories,
-                           selected_category=category,
-                           all_allergens=all_allergens,
+    return render_template('searchres.html',
+                           recipes=recipes,
                            search_query=query,
-                           no_allergens_filter=no_allergens)
+                           categories=[],
+                           all_allergens=[])
+
 @app.route('/reqister', methods=['GET', 'POST'])
 def reqister():
-    """Регистрация (с опечаткой)"""
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -255,68 +218,6 @@ def download_recipe(recipe_id):
         download_name=f'{recipe.title}.txt',
         mimetype='text/plain'
     )
-
-#
-# @app.route('/chat/send', methods=['POST'])
-# def send_message():
-#     """Отправить сообщение в AI"""
-#     message = request.form.get('message', '').strip()
-#
-#     if not message:
-#         return render_template('chat_message.html',
-#                                message="Сообщение не может быть пустым",
-#                                is_user=False)
-#
-#     user_id = get_user_id()
-#
-#     try:
-#         # Используем чистую функцию DeepSeek
-#         ai_response, success = send_to_ai(message, user_id)
-#
-#         if not success:
-#             # Если ошибка в самой функции send_to_ai
-#             return render_template('chat_message.html',
-#                                    message=ai_response,  # Здесь уже сообщение об ошибке
-#                                    is_user=False)
-#
-#         return render_template('chat_message.html',
-#                                message=ai_response,
-#                                is_user=False)
-#
-#     except Exception as e:
-#         # Перехватываем исключения, которые могли не быть обработаны
-#         error_msg = f"😔 Критическая ошибка: {str(e)}"
-#         return render_template('chat_message.html',
-#                                message=error_msg,
-#                                is_user=False)
-#
-#
-# @app.route('/chat/clear', methods=['POST'])
-# def clear_chat():
-#     """Очистить историю чата"""
-#     user_id = get_user_id()
-#     clear_chat_history(user_id)
-#
-#     return render_template('chat_message.html',
-#                            message="История очищена. Чем могу помочь?",
-#                            is_user=False)
-#
-#
-# @app.route('/chat/history', methods=['GET'])
-# def get_chat_history_route():
-#     """Получить всю историю чата"""
-#     user_id = get_user_id()
-#     history = get_chat_history(user_id)
-#
-#     # Пропускаем первое приветственное сообщение
-#     messages = history[1:] if len(history) > 1 else []
-#
-#     return render_template('chat_history.html', messages=messages)
-#
-# @app.route('/ai_chat')
-# def ai_chat():
-#     """Страница AI чата"""
-#     return render_template('ai_chat.html')
 
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')
