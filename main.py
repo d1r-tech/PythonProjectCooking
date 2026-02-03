@@ -100,8 +100,8 @@ def search():
                            categories=[],
                            all_allergens=[])
 
-@app.route('/reqister', methods=['GET', 'POST'])
-def reqister():
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
