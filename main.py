@@ -190,16 +190,12 @@ def download_recipe(recipe_id):
 
     if not recipe:
         return "Рецепт не найден", 404
-
     text = f"""
 {recipe.title}
 {'=' * 40}
-
 Категория: {recipe.category}
-
 Ингредиенты:
 {recipe.ingredients}
-
 Приготовление:
 {recipe.content}
 
